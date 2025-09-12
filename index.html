@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contractor Profit Calculator | حساب ربح المقاول</title>
+    <title id="app-title">حاسبة التكلفة التقديرية للمواد | Material Cost Estimator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         :root {
             --bg-color: #f4f4f9;
@@ -24,20 +25,21 @@
             --delete-btn-hover: #c82333;
             --error-color: #dc3545;
             --modal-bg: rgba(0, 0, 0, 0.5);
+            --icon-color: #007bff;
         }
 
         html.dark {
-            --bg-color: #121212;
+            --bg-color: #1a1a1a;
             --text-color: #e0e0e0;
-            --container-bg: #1e1e1e;
-            --input-bg: #2b2b2b;
-            --border-color: #444;
+            --container-bg: #2b2b2b;
+            --input-bg: #3c3c3c;
+            --border-color: #555;
             --button-bg: #6c757d;
             --button-text: #fff;
             --button-hover: #5a6268;
-            --header-bg: #2a2a2a;
-            --total-bg: #3a3a3a;
-            --chart-bg: #222;
+            --header-bg: #3a3a3a;
+            --total-bg: #4a4a4a;
+            --chart-bg: #333;
             --chart-grid: #444;
             --chart-text: #bbb;
             --shadow-color: rgba(255, 255, 255, 0.1);
@@ -45,6 +47,7 @@
             --delete-btn-hover: #dc3545;
             --error-color: #dc3545;
             --modal-bg: rgba(255, 255, 255, 0.2);
+            --icon-color: #fff;
         }
 
         body {
@@ -63,6 +66,16 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-container img {
+            height: 40px;
         }
 
         h1, h2, h3 {
@@ -118,6 +131,9 @@
             cursor: pointer;
             transition: background-color 0.3s;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         button:hover {
@@ -367,18 +383,23 @@
 <body>
     <div class="container">
         <header>
-            <h1><span id="header-title">Contractor Profit Calculator | حساب ربح المقاول</span></h1>
-            <div class="button-group" style="float: right;">
-                <label for="themeToggle" id="theme-label"></label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="themeToggle">
-                    <span class="slider"></span>
-                </label>
-                <label for="langToggle" id="lang-label"></label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="langToggle">
-                    <span class="slider"></span>
-                </label>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                <div class="logo-container">
+                    <img src="https://via.placeholder.com/150/007bff/fff?text=Logo" alt="Logo">
+                    <h1><span id="header-title"></span></h1>
+                </div>
+                <div class="button-group">
+                    <label for="themeToggle" id="theme-label"></label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="themeToggle">
+                        <span class="slider"></span>
+                    </label>
+                    <label for="langToggle" id="lang-label"></label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="langToggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
             </div>
             <div style="clear: both;"></div>
         </header>
@@ -404,7 +425,7 @@
                     </select>
                     <small id="rateInfo" class="currency-rate-info"></small>
                 </div>
-                <button id="refreshRateBtn" class="action-button"><span id="refresh-rate-btn">Refresh Rate</span></button>
+                <button id="refreshRateBtn" class="action-button"><i class="fas fa-sync-alt"></i> <span id="refresh-rate-btn">Refresh Rate</span></button>
                 <div id="rate-error-message"></div>
             </div>
         </section>
@@ -412,8 +433,8 @@
         <section class="controls-container">
             <h2><span id="item-management-title">Item Management</span></h2>
             <div class="button-group">
-                <button id="addItemBtn" class="action-button"><span id="add-item-btn">Add Item</span></button>
-                <button id="clearAllBtn" class="action-button delete-btn"><span id="clear-all-btn">Clear All</span></button>
+                <button id="addItemBtn" class="action-button"><i class="fas fa-plus"></i> <span id="add-item-btn">Add Item</span></button>
+                <button id="clearAllBtn" class="action-button delete-btn"><i class="fas fa-trash-alt"></i> <span id="clear-all-btn">Clear All</span></button>
             </div>
         </section>
         
@@ -463,12 +484,12 @@
         <section class="controls-container">
             <h2><span id="report-management-title">Report Management</span></h2>
             <div class="button-group">
-                <button id="exportExcelBtn" class="action-button"><span id="export-excel-btn">Export Excel</span></button>
-                <button id="exportPDFBtn" class="action-button"><span id="export-pdf-btn">Export PDF</span></button>
-                <button id="printBtn" class="action-button"><span id="print-btn">Print Report</span></button>
-                <button id="downloadTemplateBtn" class="action-button"><span id="download-template-btn">Download Excel Template</span></button>
+                <button id="exportExcelBtn" class="action-button"><i class="fas fa-file-excel"></i> <span id="export-excel-btn">Export Excel</span></button>
+                <button id="exportPDFBtn" class="action-button"><i class="fas fa-file-pdf"></i> <span id="export-pdf-btn">Export PDF</span></button>
+                <button id="printBtn" class="action-button"><i class="fas fa-print"></i> <span id="print-btn">Print Report</span></button>
+                <button id="downloadTemplateBtn" class="action-button"><i class="fas fa-download"></i> <span id="download-template-btn">Download Excel Template</span></button>
                 <input type="file" id="importExcelInput" accept=".xlsx, .xls" style="display: none;">
-                <button id="importExcelBtn" class="action-button"><span id="import-excel-btn">Import Excel</span></button>
+                <button id="importExcelBtn" class="action-button"><i class="fas fa-file-import"></i> <span id="import-excel-btn">Import Excel</span></button>
             </div>
         </section>
         
@@ -495,7 +516,7 @@
             <h3 id="modal-title">Add New Item</h3>
             <div class="form-group">
                 <label for="itemNameModal" id="item-name-label-modal">Item Name</label>
-                <input type="text" id="itemNameModal">
+                <input type="text" id="itemNameModal" required>
                 <div class="inline-error" id="nameErrorModal"></div>
             </div>
             <div class="form-group">
@@ -551,8 +572,8 @@
         const App = {
             i18n: {
                 en: {
-                    title: "Contractor Profit Calculator | حساب ربح المقاول",
-                    headerTitle: "Contractor Profit Calculator",
+                    title: "Material Cost Estimator | حاسبة التكلفة التقديرية للمواد",
+                    headerTitle: "Material Cost Estimator",
                     projectDetailsTitle: "Project Details",
                     projectNameLabel: "Project Name",
                     vatRateLabel: "VAT Rate %",
@@ -594,7 +615,7 @@
                         noItemsToCalc: "No items to calculate.",
                         importSuccess: "Items imported successfully.",
                         importError: "Failed to import Excel file. Please check the file format.",
-                        template: "Profit Calculator Template"
+                        template: "Cost Estimator Template"
                     },
                     chartLabels: {
                         costVsProfit: "Cost vs. Profit per Item",
@@ -604,8 +625,8 @@
                     }
                 },
                 ar: {
-                    title: "حساب ربح المقاول | Contractor Profit Calculator",
-                    headerTitle: "حساب ربح المقاول",
+                    title: "حاسبة التكلفة التقديرية للمواد | Material Cost Estimator",
+                    headerTitle: "حاسبة التكلفة التقديرية للمواد",
                     projectDetailsTitle: "تفاصيل المشروع",
                     projectNameLabel: "اسم المشروع",
                     vatRateLabel: "نسبة ضريبة القيمة المضافة %",
@@ -647,7 +668,7 @@
                         noItemsToCalc: "لا توجد بنود للحساب.",
                         importSuccess: "تم استيراد البنود بنجاح.",
                         importError: "فشل في استيراد ملف إكسل. يرجى التحقق من تنسيق الملف.",
-                        template: "قالب حاسبة الربح"
+                        template: "قالب حاسبة التكلفة التقديرية"
                     },
                     chartLabels: {
                         costVsProfit: "التكلفة مقابل الربح لكل بند",
@@ -670,6 +691,8 @@
 
             // UI Elements
             elements: {
+                appTitle: document.getElementById('app-title'),
+                headerTitle: document.getElementById('header-title'),
                 projectNameInput: document.getElementById('projectName'),
                 vatRateInput: document.getElementById('vatRate'),
                 currencySelect: document.getElementById('currencySelect'),
@@ -793,14 +816,14 @@
                 document.documentElement.setAttribute('dir', this.state.currentLang === 'ar' ? 'rtl' : 'ltr');
                 
                 const translatableElements = {
-                    'header-title': 'title', 'project-details-title': 'projectDetailsTitle',
+                    'app-title': 'title', 'header-title': 'headerTitle', 'project-details-title': 'projectDetailsTitle',
                     'project-name-label': 'projectNameLabel', 'vat-rate-label': 'vatRateLabel',
                     'currency-label': 'currencyLabel', 'refresh-rate-btn': 'refreshRateBtn',
-                    'item-management-title': 'itemManagementTitle', 'addItemBtn': 'addItemBtn',
-                    'clearAllBtn': 'clearAllBtn', 'total-label': 'totalLabel',
-                    'report-management-title': 'reportManagementTitle', 'exportExcelBtn': 'exportExcelBtn',
-                    'exportPDFBtn': 'exportPDFBtn', 'printBtn': 'printBtn',
-                    'downloadTemplateBtn': 'downloadTemplateBtn', 'importExcelBtn': 'importExcelBtn',
+                    'item-management-title': 'itemManagementTitle', 'add-item-btn': 'addItemBtn',
+                    'clear-all-btn': 'clearAllBtn', 'total-label': 'totalLabel',
+                    'report-management-title': 'reportManagementTitle', 'export-excel-btn': 'exportExcelBtn',
+                    'export-pdf-btn': 'exportPDFBtn', 'print-btn': 'printBtn',
+                    'download-template-btn': 'downloadTemplateBtn', 'import-excel-btn': 'importExcelBtn',
                     'charts-title': 'chartsTitle', 'lang-label': 'langLabel',
                     'theme-label': 'themeLabel', 'modal-title': 'modalTitle', 'save-item-btn-text': 'saveItemBtn'
                 };
@@ -953,12 +976,12 @@
                 const item = {
                     name: document.getElementById('itemNameModal').value,
                     unit: document.getElementById('itemUnitModal').value,
-                    quantity: parseFloat(document.getElementById('itemQuantityModal').value),
-                    costPerUnit: parseFloat(document.getElementById('itemCostModal').value),
-                    pct: parseFloat(document.getElementById('itemPctModal').value),
-                    discount: parseFloat(document.getElementById('itemDiscountModal').value),
+                    quantity: parseFloat(document.getElementById('itemQuantityModal').value) || 0,
+                    costPerUnit: parseFloat(document.getElementById('itemCostModal').value) || 0,
+                    pct: parseFloat(document.getElementById('itemPctModal').value) || 0,
+                    discount: parseFloat(document.getElementById('itemDiscountModal').value) || 0,
                     discountType: document.getElementById('itemDiscountTypeModal').value,
-                    extra: parseFloat(document.getElementById('itemExtraModal').value),
+                    extra: parseFloat(document.getElementById('itemExtraModal').value) || 0,
                     extraType: document.getElementById('itemExtraTypeModal').value,
                     method: document.getElementById('itemMethodModal').value,
                     vatChecked: document.getElementById('itemVatModal').checked,
@@ -1014,7 +1037,7 @@
                         <td>${(item.profit * this.state.currencyRate).toFixed(2) || '0.00'}</td>
                         <td>${(item.finalPrice * this.state.currencyRate).toFixed(2) || '0.00'}</td>
                         <td class="notes-cell"><input type="text" class="edit-input" data-field="notes" value="${item.notes}" oninput="App.handleInlineEdit(event, ${index})"></td>
-                        <td class="action-cell"><button class="delete-btn" onclick="App.deleteItem(${index})">${this.i18n[this.state.currentLang].clearAllBtn}</button></td>
+                        <td class="action-cell"><button class="delete-btn" onclick="App.deleteItem(${index})"><i class="fas fa-trash"></i></button></td>
                     `;
 
                     tr.innerHTML = tdTemplate;
@@ -1200,7 +1223,7 @@
                 XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
                 
                 const date = new Date().toISOString().split('T')[0];
-                const filename = `Profit_Report_${this.state.projectName || 'Project'}_${date}.xlsx`;
+                const filename = `Cost_Estimate_${this.state.projectName || 'Project'}_${date}.xlsx`;
                 XLSX.writeFile(wb, filename);
             },
 
@@ -1229,7 +1252,7 @@
 
                 const date = new Date().toISOString().split('T')[0];
                 const pdfTitle = `${this.i18n[this.state.currentLang].headerTitle} - ${this.state.projectName || 'Project'}`;
-                const filename = `Profit_Report_${this.state.projectName || 'Project'}_${date}.pdf`;
+                const filename = `Cost_Estimate_${this.state.projectName || 'Project'}_${date}.pdf`;
 
                 doc.text(pdfTitle, 14, 20);
                 doc.setFontSize(10);
@@ -1275,12 +1298,16 @@
                             {
                                 label: this.i18n[this.state.currentLang].tableHeaders[5],
                                 data: itemCosts,
-                                backgroundColor: 'rgba(54, 162, 235, 0.5)', borderColor: 'rgb(54, 162, 235)', borderWidth: 1
+                                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                                borderColor: 'rgb(54, 162, 235)',
+                                borderWidth: 1
                             },
                             {
                                 label: this.i18n[this.state.currentLang].tableHeaders[11],
                                 data: itemProfits,
-                                backgroundColor: 'rgba(75, 192, 192, 0.5)', borderColor: 'rgb(75, 192, 192)', borderWidth: 1
+                                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                                borderColor: 'rgb(75, 192, 192)',
+                                borderWidth: 1
                             }
                         ]
                     },
@@ -1301,7 +1328,7 @@
                         labels: [this.i18n[this.state.currentLang].chartLabels.totalCost, this.i18n[this.state.currentLang].chartLabels.totalProfit],
                         datasets: [{
                             data: [totalCost, totalProfit],
-                            backgroundColor: ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)'],
+                            backgroundColor: ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)'],
                             borderColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)'],
                             borderWidth: 1
                         }]
