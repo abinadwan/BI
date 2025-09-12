@@ -1,757 +1,1219 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>حساب ربح المقاول | Contractor Profit Calculator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contractor Profit Calculator | حساب ربح المقاول</title>
+    <style>
+        :root {
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --container-bg: #fff;
+            --input-bg: #e9e9ee;
+            --border-color: #ccc;
+            --button-bg: #007bff;
+            --button-text: #fff;
+            --button-hover: #0056b3;
+            --header-bg: #e2e2e7;
+            --total-bg: #d9d9e0;
+            --chart-bg: #fff;
+            --chart-grid: #ddd;
+            --chart-text: #666;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --delete-btn: #dc3545;
+            --delete-btn-hover: #c82333;
+        }
 
-<!-- External libs (CDN) -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+        html.dark {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --container-bg: #1e1e1e;
+            --input-bg: #2b2b2b;
+            --border-color: #444;
+            --button-bg: #6c757d;
+            --button-text: #fff;
+            --button-hover: #5a6268;
+            --header-bg: #2a2a2a;
+            --total-bg: #3a3a3a;
+            --chart-bg: #222;
+            --chart-grid: #444;
+            --chart-text: #bbb;
+            --shadow-color: rgba(255, 255, 255, 0.1);
+            --delete-btn: #dc3545;
+            --delete-btn-hover: #dc3545;
+        }
 
-<style>
-:root{
-  --bg: #ffffff; --fg:#111827; --muted:#6b7280; --card:#f3f4f6; --border:#e5e7eb;
-  --primary:#2563eb; --accent:#10b981; --danger:#ef4444; --warn:#f59e0b;
-}
-:root.dark{
-  --bg:#0b0f14; --fg:#e5e7eb; --muted:#94a3b8; --card:#0f172a; --border:#1f2937;
-  --primary:#60a5fa; --accent:#34d399; --danger:#f87171; --warn:#fbbf24;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0; font-family:ui-sans-serif,system-ui,"Segoe UI",Tahoma,Arial;
-  background:var(--bg); color:var(--fg);
-}
-.container{max-width:1200px;margin:auto;padding:16px}
-.header{
-  display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-  margin-bottom:12px
-}
-.badge{padding:.25rem .5rem;border:1px solid var(--border);border-radius:8px;background:var(--card)}
-.controls{display:flex;gap:8px;flex-wrap:wrap}
-button,.btn{
-  background:var(--primary); color:#fff; border:none; padding:10px 14px; border-radius:10px; cursor:pointer;
-}
-button.secondary{background:var(--accent)}
-button.warn{background:var(--warn)}
-button.danger{background:var(--danger)}
-button.ghost{background:transparent;color:var(--fg);border:1px solid var(--border)}
-button:disabled{opacity:.5;cursor:not-allowed}
-.card{
-  background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:12px
-}
-.grid{display:grid;gap:10px}
-.grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
-.grid.cols-6{grid-template-columns:repeat(6,minmax(0,1fr))}
-.grid.cols-8{grid-template-columns:repeat(8,minmax(0,1fr))}
-input,select,textarea{
-  width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; background:transparent; color:var(--fg)
-}
-label{font-size:.9rem;color:var(--muted)}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.flex{display:flex;gap:8px;align-items:center}
-.spacer{flex:1}
-.table-wrap{overflow:auto;border:1px solid var(--border);border-radius:12px}
-table{width:100%;border-collapse:separate;border-spacing:0;min-width:1000px}
-thead th{
-  position:sticky; top:0; background:var(--card); border-bottom:1px solid var(--border);
-  text-align:inherit; padding:10px; font-weight:600
-}
-tbody td{border-bottom:1px solid var(--border); padding:8px}
-tfoot td{background:var(--card); font-weight:700; padding:10px; border-top:2px solid var(--border)}
-.num{text-align:end}
-.small{font-size:.85rem;color:var(--muted)}
-hr{border:none;border-top:1px solid var(--border);margin:10px 0}
-.kpi{display:flex; gap:12px; flex-wrap:wrap}
-.kpi .box{flex:1; min-width:220px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px}
-.kpi .val{font-size:1.25rem;font-weight:700}
-footer{margin:24px 0 8px;color:var(--muted);font-size:.85rem;text-align:center}
-.switch{
-  border:1px solid var(--border); border-radius:10px; padding:6px 10px; background:var(--card); cursor:pointer
-}
-@media (max-width:720px){
-  .grid.cols-6{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .grid.cols-8{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .grid.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-</style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: var(--container-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        h1, h2, h3 {
+            color: var(--text-color);
+        }
+
+        .controls-container, .table-container, .charts-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            background-color: var(--container-bg);
+            box-shadow: 0 2px 6px var(--shadow-color);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .action-button {
+            padding: 8px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        .delete-btn {
+            background-color: var(--delete-btn);
+        }
+
+        .delete-btn:hover {
+            background-color: var(--delete-btn-hover);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            position: relative;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            table-layout: auto;
+        }
+        
+        thead th, tfoot td {
+            background-color: var(--header-bg);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+            word-wrap: break-word;
+        }
+
+        tr.total-row td {
+            background-color: var(--total-bg);
+            font-weight: bold;
+        }
+
+        .edit-input, .edit-select {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid var(--border-color);
+            padding: 5px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+
+        .currency-rate-info {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .saved-message {
+            font-size: 0.8em;
+            color: #008000;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        #chart-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .chart-box {
+            background-color: var(--chart-bg);
+            padding: 10px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px var(--shadow-color);
+        }
+
+        @media (min-width: 768px) {
+            #chart-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media print {
+            body {
+                background-color: #fff;
+                color: #000;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+            }
+            .controls-container, .charts-container, button, .footer, .action-cell, .notes-cell {
+                display: none;
+            }
+            .table-container {
+                overflow: visible;
+            }
+            h1, h2 {
+                color: #000;
+            }
+            table {
+                font-size: 10px;
+            }
+            th, td {
+                border: 1px solid #000;
+                padding: 5px;
+            }
+            thead th, tfoot td {
+                background-color: #f0f0f0;
+                position: static;
+            }
+        }
+
+        /* RTL Specific styles */
+        html[dir="rtl"] body {
+            text-align: right;
+        }
+
+        html[dir="rtl"] .controls-grid {
+            direction: rtl;
+        }
+
+        html[dir="rtl"] thead th, html[dir="rtl"] td {
+            text-align: right;
+        }
+
+        html[dir="rtl"] .saved-message {
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-  <div class="header">
-    <div class="row">
-      <div class="badge" id="appTitle">حساب ربح المقاول</div>
-      <div class="badge" id="projectNameBadge"></div>
-    </div>
-    <div class="controls">
-      <button class="switch" id="langToggle">EN</button>
-      <button class="switch" id="themeToggle">🌙</button>
-      <select id="currencySelect" class="switch">
-        <option value="SAR">SAR ﷼</option>
-        <option value="USD">USD $</option>
-        <option value="EUR">EUR €</option>
-      </select>
-      <button class="switch" id="rateRefresh">تحديث سعر الصرف</button>
-    </div>
-  </div>
+    <div class="container">
+        <header>
+            <h1><span id="header-title">Contractor Profit Calculator | حساب ربح المقاول</span></h1>
+            <div class="button-group" style="float: right;">
+                <label for="themeToggle" id="theme-label"></label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="themeToggle">
+                    <span class="slider"></span>
+                </label>
+                <label for="langToggle" id="lang-label"></label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="langToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div style="clear: both;"></div>
+        </header>
 
-  <div class="card">
-    <div class="row" style="justify-content:space-between">
-      <div class="flex">
-        <label class="small" id="lblProject">اسم المشروع</label>
-        <input id="projectName" placeholder="مثال: توريد مواد كهربائية"/>
-      </div>
-      <div class="flex">
-        <label class="small" id="lblVatRate">نسبة الضريبة %</label>
-        <input id="vatRate" type="number" step="0.01" min="0" value="15"/>
-      </div>
-      <div class="spacer"></div>
-      <div class="flex">
-        <button id="downloadTemplate" class="ghost">تنزيل قالب Excel</button>
-        <input type="file" id="excelInput" accept=".xlsx,.xls" style="display:none"/>
-        <button id="importExcel" class="ghost">استيراد Excel</button>
-      </div>
-    </div>
-    <hr/>
-    <div class="grid cols-8">
-      <div>
-        <label id="lblItem">اسم البند</label>
-        <input id="itemName" placeholder="كيبل نحاسي 16مم"/>
-      </div>
-      <div>
-        <label id="lblUnit">الوحدة</label>
-        <select id="itemUnit">
-          <option value="قطعة">قطعة</option>
-          <option value="متر">متر</option>
-          <option value="طن">طن</option>
-        </select>
-      </div>
-      <div>
-        <label id="lblQty">الكمية</label>
-        <input id="itemQty" type="number" min="0" step="1" value="1"/>
-      </div>
-      <div>
-        <label id="lblCostUnit">سعر التكلفة/وحدة</label>
-        <input id="itemCost" type="number" min="0" step="0.01" value="0"/>
-      </div>
-      <div>
-        <label id="lblPct">النسبة %</label>
-        <input id="itemPct" type="number" min="0" max="99.99" step="0.01" value="25"/>
-      </div>
-      <div>
-        <label id="lblDiscount">الخصم</label>
-        <div class="row">
-          <input id="itemDiscount" type="number" min="0" step="0.01" value="0"/>
-          <select id="itemDiscountType" style="max-width:90px">
-            <option value="amount">مبلغ</option>
-            <option value="percent">%</option>
-          </select>
+        <section class="controls-container">
+            <h2><span id="project-details-title">Project Details</span></h2>
+            <div class="controls-grid">
+                <div class="form-group">
+                    <label for="projectName" id="project-name-label">Project Name</label>
+                    <input type="text" id="projectName">
+                </div>
+                <div class="form-group">
+                    <label for="vatRate" id="vat-rate-label">VAT Rate %</label>
+                    <input type="number" id="vatRate" value="15" min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="currencySelect" id="currency-label">Currency</label>
+                    <select id="currencySelect">
+                        <option value="SAR">SAR</option>
+                        <option value="USD">USD</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                    </select>
+                    <small id="rateInfo" class="currency-rate-info"></small>
+                </div>
+                <button id="refreshRateBtn" class="action-button"><span id="refresh-rate-btn">Refresh Rate</span></button>
+            </div>
+        </section>
+
+        <section class="controls-container">
+            <h2><span id="item-management-title">Item Management</span></h2>
+            <div class="button-group">
+                <button id="addItemBtn" class="action-button"><span id="add-item-btn">Add Item</span></button>
+                <button id="calculateBtn" class="action-button"><span id="calculate-btn">Calculate</span></button>
+                <button id="clearAllBtn" class="action-button delete-btn"><span id="clear-all-btn">Clear All</span></button>
+            </div>
+        </section>
+        
+        <section class="table-container">
+            <table>
+                <thead>
+                    <tr id="table-headers">
+                        <th>#</th>
+                        <th>Item</th>
+                        <th>Unit</th>
+                        <th>Qty</th>
+                        <th>Cost/Unit</th>
+                        <th>Total Cost</th>
+                        <th>%</th>
+                        <th>Discount</th>
+                        <th>Extra Costs</th>
+                        <th>Method</th>
+                        <th>VAT</th>
+                        <th>Profit</th>
+                        <th>Final Price</th>
+                        <th>Notes</th>
+                        <th class="action-cell">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsTableBody">
+                    </tbody>
+                <tfoot id="table-footer">
+                    <tr class="total-row">
+                        <td colspan="3"><span id="total-label">Totals</span></td>
+                        <td id="totalQty">0</td>
+                        <td></td>
+                        <td id="totalCost">0</td>
+                        <td></td>
+                        <td id="totalDiscount">0</td>
+                        <td id="totalExtra">0</td>
+                        <td></td>
+                        <td></td>
+                        <td id="totalProfit">0</td>
+                        <td id="totalPrice">0</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </section>
+        
+        <section class="controls-container">
+            <h2><span id="report-management-title">Report Management</span></h2>
+            <div class="button-group">
+                <button id="exportExcelBtn" class="action-button"><span id="export-excel-btn">Export Excel</span></button>
+                <button id="exportPDFBtn" class="action-button"><span id="export-pdf-btn">Export PDF</span></button>
+                <button id="printBtn" class="action-button"><span id="print-btn">Print Report</span></button>
+                <button id="downloadTemplateBtn" class="action-button"><span id="download-template-btn">Download Excel Template</span></button>
+                <input type="file" id="importExcelInput" accept=".xlsx, .xls" style="display: none;">
+                <button id="importExcelBtn" class="action-button"><span id="import-excel-btn">Import Excel</span></button>
+            </div>
+        </section>
+        
+        <section class="charts-container">
+            <h2><span id="charts-title">Charts</span></h2>
+            <div id="chart-container">
+                <div class="chart-box">
+                    <canvas id="costProfitBarChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <canvas id="costProfitPieChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <div class="footer">
+            <span id="saved-message" class="saved-message"></span>
         </div>
-      </div>
-      <div>
-        <label id="lblExtra">مصاريف إضافية</label>
-        <div class="row">
-          <input id="itemExtra" type="number" min="0" step="0.01" value="0"/>
-          <select id="itemExtraType" style="max-width:120px">
-            <option value="total">إجمالي</option>
-            <option value="perunit">لكل وحدة</option>
-          </select>
-        </div>
-      </div>
-      <div>
-        <label id="lblMethod">طريقة الحسبة</label>
-        <select id="itemMethod">
-          <option value="costplus">كوست بلس</option>
-          <option value="margin">ميرج</option>
-        </select>
-      </div>
-      <div style="grid-column:1/-1">
-        <div class="row">
-          <div class="flex">
-            <input id="itemVat" type="checkbox" checked/>
-            <label for="itemVat" id="lblItemVat">تطبيق ضريبة VAT على هذا البند</label>
-          </div>
-          <div class="spacer"></div>
-          <input id="itemNotes" placeholder="ملاحظات (اختياري)" style="max-width:420px"/>
-          <button id="addItem" class="secondary">إضافة بند</button>
-          <button id="calcAll" class="">احسب</button>
-        </div>
-      </div>
+
     </div>
-  </div>
 
-  <div class="kpi">
-    <div class="box">
-      <div id="kpiCostLbl" class="small">إجمالي التكلفة</div>
-      <div id="kpiCost" class="val">0</div>
-    </div>
-    <div class="box">
-      <div id="kpiProfitLbl" class="small">إجمالي الربح</div>
-      <div id="kpiProfit" class="val">0</div>
-    </div>
-    <div class="box">
-      <div id="kpiPriceLbl" class="small">إجمالي السعر النهائي</div>
-      <div id="kpiPrice" class="val">0</div>
-    </div>
-  </div>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+    <script>
+        window.jsPDF = jspdf.jsPDF;
 
-  <div class="row" style="margin:8px 0">
-    <div class="flex">
-      <button id="exportExcel" class="ghost">تصدير Excel</button>
-      <button id="exportPDF" class="ghost">تصدير PDF</button>
-      <button id="printReport" class="ghost">طباعة التقرير</button>
-    </div>
-    <div class="spacer"></div>
-    <div class="flex">
-      <button id="clearAll" class="danger">مسح الكل</button>
-      <span class="small" id="rateInfo"></span>
-    </div>
-  </div>
+        const i18n = {
+            en: {
+                title: "Contractor Profit Calculator | حساب ربح المقاول",
+                headerTitle: "Contractor Profit Calculator",
+                projectDetailsTitle: "Project Details",
+                projectNameLabel: "Project Name",
+                vatRateLabel: "VAT Rate %",
+                currencyLabel: "Currency",
+                refreshRateBtn: "Refresh Rate",
+                itemManagementTitle: "Item Management",
+                addItemBtn: "Add Item",
+                calculateBtn: "Calculate",
+                clearAllBtn: "Clear All",
+                tableHeaders: ["#", "Item", "Unit", "Qty", "Cost/Unit", "Total Cost", "%", "Discount", "Extra Costs", "Method", "VAT", "Profit", "Final Price", "Notes", "Actions"],
+                totalLabel: "Totals",
+                reportManagementTitle: "Report Management",
+                exportExcelBtn: "Export Excel",
+                exportPDFBtn: "Export PDF",
+                printBtn: "Print Report",
+                downloadTemplateBtn: "Download Excel Template",
+                importExcelBtn: "Import Excel",
+                chartsTitle: "Charts",
+                savedMessage: "Auto-saved",
+                langLabel: "العربية",
+                themeLabel: "Dark Mode",
+                units: {
+                    Piece: "Piece", Meter: "Meter", Ton: "Ton"
+                },
+                methods: {
+                    costplus: "Cost Plus", margin: "Margin"
+                },
+                discountTypes: {
+                    amount: "Amount", percent: "Percent"
+                },
+                extraTypes: {
+                    total: "Total", perunit: "Per Unit"
+                },
+                validation: {
+                    emptyName: "Item name cannot be empty.",
+                    marginError: "Percentage must be less than 100 for Margin method.",
+                    rateFetchFailed: "Failed to fetch currency rate. Using fallback rate of 1.0.",
+                    noItemsToCalc: "No items to calculate.",
+                    importSuccess: "Items imported successfully.",
+                    importError: "Failed to import Excel file. Please check the file format.",
+                    template: "Profit Calculator Template"
+                },
+                chartLabels: {
+                    costVsProfit: "Cost vs. Profit per Item",
+                    totalCostVsProfit: "Total Cost vs. Profit",
+                    totalCost: "Total Cost",
+                    totalProfit: "Total Profit"
+                }
+            },
+            ar: {
+                title: "حساب ربح المقاول | Contractor Profit Calculator",
+                headerTitle: "حساب ربح المقاول",
+                projectDetailsTitle: "تفاصيل المشروع",
+                projectNameLabel: "اسم المشروع",
+                vatRateLabel: "نسبة ضريبة القيمة المضافة %",
+                currencyLabel: "العملة",
+                refreshRateBtn: "تحديث السعر",
+                itemManagementTitle: "إدارة البنود",
+                addItemBtn: "إضافة بند",
+                calculateBtn: "حساب",
+                clearAllBtn: "مسح الكل",
+                tableHeaders: ["#", "البند", "الوحدة", "الكمية", "سعر التكلفة/وحدة", "إجمالي التكلفة", "النسبة %", "الخصم", "مصاريف إضافية", "طريقة الحسبة", "ضريبة", "الربح", "السعر النهائي", "ملاحظات", "إجراءات"],
+                totalLabel: "الإجماليات",
+                reportManagementTitle: "إدارة التقارير",
+                exportExcelBtn: "تصدير إلى إكسل",
+                exportPDFBtn: "تصدير إلى PDF",
+                printBtn: "طباعة التقرير",
+                downloadTemplateBtn: "تحميل قالب إكسل",
+                importExcelBtn: "استيراد إكسل",
+                chartsTitle: "الرسوم البيانية",
+                savedMessage: "تم الحفظ تلقائياً",
+                langLabel: "English",
+                themeLabel: "الوضع الداكن",
+                units: {
+                    Piece: "قطعة", Meter: "متر", Ton: "طن"
+                },
+                methods: {
+                    costplus: "التكلفة +", margin: "هامش الربح"
+                },
+                discountTypes: {
+                    amount: "قيمة", percent: "نسبة"
+                },
+                extraTypes: {
+                    total: "إجمالي", perunit: "للوحدة"
+                },
+                validation: {
+                    emptyName: "لا يمكن أن يكون اسم البند فارغاً.",
+                    marginError: "يجب أن تكون النسبة أقل من 100 لطريقة هامش الربح.",
+                    rateFetchFailed: "فشل في جلب سعر الصرف. سيتم استخدام سعر افتراضي 1.0.",
+                    noItemsToCalc: "لا توجد بنود للحساب.",
+                    importSuccess: "تم استيراد البنود بنجاح.",
+                    importError: "فشل في استيراد ملف إكسل. يرجى التحقق من تنسيق الملف.",
+                    template: "قالب حاسبة الربح"
+                },
+                chartLabels: {
+                    costVsProfit: "التكلفة مقابل الربح لكل بند",
+                    totalCostVsProfit: "إجمالي التكلفة مقابل الربح",
+                    totalCost: "إجمالي التكلفة",
+                    totalProfit: "إجمالي الربح"
+                }
+            }
+        };
 
-  <div class="table-wrap card">
-    <table id="itemsTable">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th id="thItem">البند</th>
-          <th id="thUnit">الوحدة</th>
-          <th id="thQty" class="num">الكمية</th>
-          <th id="thCostUnit" class="num">التكلفة/وحدة</th>
-          <th id="thTotalCost" class="num">إجمالي التكلفة</th>
-          <th id="thPct" class="num">% الربح</th>
-          <th id="thDiscount" class="num">الخصم</th>
-          <th id="thExtra" class="num">مصاريف</th>
-          <th id="thMethod">الطريقة</th>
-          <th id="thVat">VAT</th>
-          <th id="thProfit" class="num">الربح</th>
-          <th id="thPrice" class="num">السعر النهائي</th>
-          <th id="thNotes">ملاحظات</th>
-          <th id="thActions">إجراءات</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-      <tfoot>
-        <tr>
-          <td colspan="5" class="num">الإجماليات</td>
-          <td class="num" id="tTotalCost">0</td>
-          <td></td>
-          <td class="num" id="tTotalDiscount">0</td>
-          <td class="num" id="tTotalExtra">0</td>
-          <td></td><td></td>
-          <td class="num" id="tTotalProfit">0</td>
-          <td class="num" id="tTotalPrice">0</td>
-          <td></td><td></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
+        let items = [];
+        let currentLang = 'en';
+        let currentTheme = 'light';
+        let currencyRate = 1.0;
+        let vatRate = 15;
 
-  <div class="card">
-    <canvas id="chartBar" height="90"></canvas>
-    <hr/>
-    <canvas id="chartPie" height="90"></canvas>
-  </div>
+        // UI Elements
+        const projectNameInput = document.getElementById('projectName');
+        const vatRateInput = document.getElementById('vatRate');
+        const currencySelect = document.getElementById('currencySelect');
+        const rateInfoSpan = document.getElementById('rateInfo');
+        const themeToggle = document.getElementById('themeToggle');
+        const langToggle = document.getElementById('langToggle');
+        const itemsTableBody = document.getElementById('itemsTableBody');
+        const totalQtyTd = document.getElementById('totalQty');
+        const totalCostTd = document.getElementById('totalCost');
+        const totalProfitTd = document.getElementById('totalProfit');
+        const totalPriceTd = document.getElementById('totalPrice');
+        const totalDiscountTd = document.getElementById('totalDiscount');
+        const totalExtraTd = document.getElementById('totalExtra');
+        const savedMessage = document.getElementById('saved-message');
+        const importExcelInput = document.getElementById('importExcelInput');
+        const costProfitBarChartCanvas = document.getElementById('costProfitBarChart');
+        const costProfitPieChartCanvas = document.getElementById('costProfitPieChart');
+        let barChartInstance, pieChartInstance;
 
-  <footer id="footerNote">تم الحفظ تلقائياً في المتصفح.</footer>
-</div>
+        // Event Listeners
+        document.getElementById('addItemBtn').addEventListener('click', addItem);
+        document.getElementById('calculateBtn').addEventListener('click', calculateAll);
+        document.getElementById('clearAllBtn').addEventListener('click', clearAll);
+        document.getElementById('refreshRateBtn').addEventListener('click', updateCurrencyRates);
+        document.getElementById('exportExcelBtn').addEventListener('click', exportExcel);
+        document.getElementById('exportPDFBtn').addEventListener('click', exportPDF);
+        document.getElementById('printBtn').addEventListener('click', () => window.print());
+        document.getElementById('downloadTemplateBtn').addEventListener('click', downloadTemplate);
+        document.getElementById('importExcelBtn').addEventListener('click', () => importExcelInput.click());
+        importExcelInput.addEventListener('change', importExcel);
+        themeToggle.addEventListener('change', setTheme);
+        langToggle.addEventListener('change', setLanguage);
+        document.addEventListener('DOMContentLoaded', loadState);
 
-<script>
-/* ====== i18n ====== */
-const i18n = {
-  ar: {
-    title:'حساب ربح المقاول',
-    project:'اسم المشروع',
-    vatRate:'نسبة الضريبة %',
-    downloadTpl:'تنزيل قالب Excel',
-    import:'استيراد Excel',
-    item:'اسم البند', unit:'الوحدة', qty:'الكمية', costUnit:'سعر التكلفة/وحدة',
-    pct:'النسبة %', discount:'الخصم', extra:'مصاريف إضافية', method:'طريقة الحسبة',
-    costplus:'كوست بلس', margin:'ميرج', notes:'ملاحظات', addItem:'إضافة بند', calc:'احسب',
-    kpiCost:'إجمالي التكلفة', kpiProfit:'إجمالي الربح', kpiPrice:'إجمالي السعر النهائي',
-    exportX:'تصدير Excel', exportP:'تصدير PDF', print:'طباعة التقرير', clearAll:'مسح الكل',
-    th:{item:'البند', unit:'الوحدة', qty:'الكمية', costUnit:'التكلفة/وحدة', totalCost:'إجمالي التكلفة',
-        pct:'% الربح', discount:'الخصم', extra:'مصاريف', method:'الطريقة', vat:'VAT',
-        profit:'الربح', price:'السعر النهائي', notes:'ملاحظات', actions:'إجراءات'},
-    itemVat:'تطبيق ضريبة VAT على هذا البند',
-    amount:'مبلغ', percent:'%', extraTotal:'إجمالي', extraPerUnit:'لكل وحدة',
-    delete:'حذف', langBtn:'EN', themeMoon:'🌙', themeSun:'☀️',
-    totals:'الإجماليات', saved:'تم الحفظ تلقائياً في المتصفح.', rateBtn:'تحديث سعر الصرف',
-    rateInfo:(b, r)=>`العملة: ${b} | سعر التحويل: ${r.toFixed(4)}`
-  },
-  en: {
-    title:'Contractor Profit Calculator',
-    project:'Project name',
-    vatRate:'VAT rate %',
-    downloadTpl:'Download Excel template',
-    import:'Import Excel',
-    item:'Item name', unit:'Unit', qty:'Quantity', costUnit:'Cost / Unit',
-    pct:'Margin %', discount:'Discount', extra:'Extra Costs', method:'Method',
-    costplus:'Cost Plus', margin:'Margin', notes:'Notes', addItem:'Add Item', calc:'Calculate',
-    kpiCost:'Total Cost', kpiProfit:'Total Profit', kpiPrice:'Total Final Price',
-    exportX:'Export Excel', exportP:'Export PDF', print:'Print report', clearAll:'Clear All',
-    th:{item:'Item', unit:'Unit', qty:'Qty', costUnit:'Cost/Unit', totalCost:'Total Cost',
-        pct:'% Profit', discount:'Discount', extra:'Extra', method:'Method', vat:'VAT',
-        profit:'Profit', price:'Final Price', notes:'Notes', actions:'Actions'},
-    itemVat:'Apply VAT to this item',
-    amount:'Amount', percent:'%', extraTotal:'Total', extraPerUnit:'Per unit',
-    delete:'Delete', langBtn:'ع', themeMoon:'🌙', themeSun:'☀️',
-    totals:'Totals', saved:'Auto-saved locally.', rateBtn:'Refresh rate',
-    rateInfo:(b, r)=>`Currency: ${b} | Rate: ${r.toFixed(4)}`
-  }
-};
+        // State Management
+        function saveState() {
+            const state = {
+                items,
+                currentLang,
+                currentTheme,
+                currencyRate,
+                currency: currencySelect.value,
+                vatRate: vatRateInput.value,
+                projectName: projectNameInput.value
+            };
+            localStorage.setItem('profitCalculatorState', JSON.stringify(state));
+            showSavedMessage();
+        }
 
-/* ====== State ====== */
-let state = {
-  lang: localStorage.getItem('lang') || 'ar',
-  theme: localStorage.getItem('theme') || 'light',
-  currency: localStorage.getItem('currency') || 'SAR',
-  baseCurrency: 'SAR',
-  rate: Number(localStorage.getItem('rate') || '1'),
-  vatRate: Number(localStorage.getItem('vatRate') || '15'),
-  projectName: localStorage.getItem('projectName') || '',
-  items: JSON.parse(localStorage.getItem('items') || '[]')
-};
+        function loadState() {
+            const state = JSON.parse(localStorage.getItem('profitCalculatorState'));
+            if (state) {
+                items = state.items;
+                currentLang = state.currentLang;
+                currentTheme = state.currentTheme;
+                currencyRate = state.currencyRate;
+                currencySelect.value = state.currency;
+                vatRateInput.value = state.vatRate;
+                projectNameInput.value = state.projectName;
+            } else {
+                addDemoItems();
+            }
 
-// demo items on first use
-if (!localStorage.getItem('items')) {
-  state.items = [
-    {id: uid(), name:'كيبل نحاسي 16مم', unit:'متر', qty:100, cost:8.50, pct:25, discount:0, discountType:'amount', extra:0, extraType:'total', method:'costplus', vat:true, notes:''},
-    {id: uid(), name:'قاطع تيار 100A', unit:'قطعة', qty:10, cost:55, pct:20, discount:5, discountType:'percent', extra:2, extraType:'perunit', method:'margin', vat:true, notes:''}
-  ];
-}
+            if (currentTheme === 'dark') {
+                themeToggle.checked = true;
+                document.documentElement.classList.add('dark');
+            }
+            if (currentLang === 'ar') {
+                langToggle.checked = true;
+                document.documentElement.setAttribute('dir', 'rtl');
+            }
+            
+            setLanguage();
+            updateRateInfo();
+            renderTable();
+            calculateAll();
+        }
 
-/* ====== Helpers ====== */
-function uid(){ return Math.random().toString(36).slice(2,9); }
-function fmt(n){ return (isFinite(n)? Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}) : '0.00'); }
-function money(n){ return fmt(n); }
-function save(){ localStorage.setItem('items',JSON.stringify(state.items));
-  localStorage.setItem('lang',state.lang);
-  localStorage.setItem('theme',state.theme);
-  localStorage.setItem('currency',state.currency);
-  localStorage.setItem('rate',String(state.rate));
-  localStorage.setItem('vatRate',String(state.vatRate));
-  localStorage.setItem('projectName',state.projectName);
-  document.getElementById('footerNote').textContent = t().saved;
-}
-function t(){ return i18n[state.lang]; }
-function setDir(){ document.documentElement.dir = (state.lang==='ar'?'rtl':'ltr'); document.documentElement.lang = state.lang; }
+        function showSavedMessage() {
+            savedMessage.textContent = i18n[currentLang].savedMessage;
+            savedMessage.style.display = 'block';
+            setTimeout(() => savedMessage.style.display = 'none', 2000);
+        }
 
-/* ====== Currency Rates ====== */
-async function fetchRate(){
-  // convert from base (SAR) to selected currency
-  try{
-    if (state.currency === state.baseCurrency){ state.rate = 1; save(); updateRateInfo(); return; }
-    const res = await fetch(`https://api.exchangerate.host/latest?base=${state.baseCurrency}&symbols=${state.currency}`);
-    const data = await res.json();
-    const r = data?.rates?.[state.currency];
-    state.rate = (typeof r === 'number' && r>0) ? r : 1;
-  }catch(e){ state.rate = 1; }
-  save(); updateRateInfo(); render();
-}
-function updateRateInfo(){
-  const info = document.getElementById('rateInfo');
-  info.textContent = t().rateInfo(`${state.baseCurrency}→${state.currency}`, state.rate);
-}
+        function addDemoItems() {
+            items = [
+                {
+                    name: "Steel Rebars",
+                    unit: "Ton",
+                    quantity: 50,
+                    costPerUnit: 2500,
+                    pct: 15,
+                    discount: 0,
+                    discountType: "amount",
+                    extra: 0,
+                    extraType: "total",
+                    method: "costplus",
+                    vatChecked: true,
+                    notes: "High quality steel"
+                },
+                {
+                    name: "Concrete",
+                    unit: "Meter",
+                    quantity: 200,
+                    costPerUnit: 350,
+                    pct: 25,
+                    discount: 500,
+                    discountType: "amount",
+                    extra: 5,
+                    extraType: "perunit",
+                    method: "margin",
+                    vatChecked: false,
+                    notes: "Ready-mix concrete"
+                }
+            ];
+            saveState();
+        }
 
-/* ====== Calculations ====== */
-function adjustedCost(item){
-  const qty = Number(item.qty)||0, cost = Number(item.cost)||0;
-  let base = cost * qty;
-  const extra = Number(item.extra)||0;
-  const extraAdd = (item.extraType==='perunit') ? extra * qty : extra;
-  // discount per unit or percent
-  let discountVal = Number(item.discount)||0;
-  if (item.discountType==='percent'){
-    discountVal = base * (discountVal/100);
-  }
-  base = base + extraAdd - discountVal;
-  return Math.max(base,0);
-}
-function calcItem(item){
-  const vatRate = (Number(state.vatRate)||0)/100;
-  const adj = adjustedCost(item);
-  const pct = Math.max(0, Number(item.pct)||0)/100;
+        // Language & Theme
+        function setLanguage() {
+            currentLang = langToggle.checked ? 'ar' : 'en';
+            document.documentElement.setAttribute('dir', currentLang === 'ar' ? 'rtl' : 'ltr');
+            
+            const translatableElements = {
+                'header-title': 'title',
+                'project-details-title': 'projectDetailsTitle',
+                'project-name-label': 'projectNameLabel',
+                'vat-rate-label': 'vatRateLabel',
+                'currency-label': 'currencyLabel',
+                'refresh-rate-btn': 'refreshRateBtn',
+                'item-management-title': 'itemManagementTitle',
+                'add-item-btn': 'addItemBtn',
+                'calculate-btn': 'calculateBtn',
+                'clear-all-btn': 'clearAllBtn',
+                'total-label': 'totalLabel',
+                'report-management-title': 'reportManagementTitle',
+                'export-excel-btn': 'exportExcelBtn',
+                'export-pdf-btn': 'exportPDFBtn',
+                'print-btn': 'printBtn',
+                'download-template-btn': 'downloadTemplateBtn',
+                'import-excel-btn': 'importExcelBtn',
+                'charts-title': 'chartsTitle',
+                'lang-label': 'langLabel',
+                'theme-label': 'themeLabel'
+            };
 
-  if (item.method==='margin'){
-    if (pct>=1){ return {profit:0, price:adj, totalCost: item.cost*item.qty, discountVal:0, extraVal:0, valid:false}; }
-    const price = adj/(1-pct);
-    const profit = price - adj;
-    const withVat = item.vat ? price*(1+vatRate) : price;
-    return {profit, price:withVat, totalCost:item.cost*item.qty, valid:true};
-  }else{ // cost plus
-    const profit = adj*pct;
-    const price = adj + profit;
-    const withVat = item.vat ? price*(1+vatRate) : price;
-    return {profit, price:withVat, totalCost:item.cost*item.qty, valid:true};
-  }
-}
+            for (const [id, key] of Object.entries(translatableElements)) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = i18n[currentLang][key];
+            }
+            
+            const headers = document.getElementById('table-headers').children;
+            i18n[currentLang].tableHeaders.forEach((text, index) => {
+                if (headers[index]) headers[index].textContent = text;
+            });
+            
+            renderTable();
+            drawCharts();
+            updateRateInfo();
+            saveState();
+        }
 
-/* ====== Render ====== */
-function render(){
-  // header texts / labels
-  document.getElementById('appTitle').textContent = t().title;
-  document.getElementById('lblProject').textContent = t().project;
-  document.getElementById('lblVatRate').textContent = t().vatRate;
-  document.getElementById('downloadTemplate').textContent = t().downloadTpl;
-  document.getElementById('importExcel').textContent = t().import;
+        function setTheme() {
+            currentTheme = themeToggle.checked ? 'dark' : 'light';
+            document.documentElement.classList.toggle('dark', currentTheme === 'dark');
+            drawCharts();
+            saveState();
+        }
 
-  document.getElementById('lblItem').textContent = t().item;
-  document.getElementById('lblUnit').textContent = t().unit;
-  document.getElementById('lblQty').textContent = t().qty;
-  document.getElementById('lblCostUnit').textContent = t().costUnit;
-  document.getElementById('lblPct').textContent = t().pct;
-  document.getElementById('lblDiscount').textContent = t().discount;
-  document.getElementById('lblExtra').textContent = t().extra;
-  document.getElementById('lblMethod').textContent = t().method;
-  document.getElementById('lblItemVat').textContent = t().itemVat;
+        // Currency
+        async function updateCurrencyRates() {
+            const currency = currencySelect.value;
+            if (currency === 'SAR') {
+                currencyRate = 1.0;
+                updateRateInfo();
+                calculateAll();
+                return;
+            }
+            try {
+                const response = await fetch(`https://api.exchangerate.host/latest?base=SAR&symbols=${currency}`);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                currencyRate = data.rates[currency] || 1.0;
+            } catch (error) {
+                console.error("Failed to fetch currency rates:", error);
+                currencyRate = 1.0;
+                alert(i18n[currentLang].validation.rateFetchFailed);
+            }
+            updateRateInfo();
+            calculateAll();
+            saveState();
+        }
 
-  document.getElementById('addItem').textContent = t().addItem;
-  document.getElementById('calcAll').textContent = t().calc;
+        function updateRateInfo() {
+            const currency = currencySelect.value;
+            rateInfoSpan.textContent = `1 SAR = ${currencyRate.toFixed(4)} ${currency}`;
+        }
 
-  document.getElementById('kpiCostLbl').textContent = t().kpiCost;
-  document.getElementById('kpiProfitLbl').textContent = t().kpiProfit;
-  document.getElementById('kpiPriceLbl').textContent = t().kpiPrice;
+        // Core Calculation
+        function calculateAll() {
+            if (items.length === 0) {
+                alert(i18n[currentLang].validation.noItemsToCalc);
+                return;
+            }
 
-  document.getElementById('exportExcel').textContent = t().exportX;
-  document.getElementById('exportPDF').textContent = t().exportP;
-  document.getElementById('printReport').textContent = t().print;
-  document.getElementById('clearAll').textContent = t().clearAll;
+            let totalQty = 0, totalCost = 0, totalProfit = 0, totalPrice = 0, totalDiscount = 0, totalExtra = 0;
+            const vatRate = parseFloat(vatRateInput.value) / 100;
 
-  // table headers
-  document.getElementById('thItem').textContent = t().th.item;
-  document.getElementById('thUnit').textContent = t().th.unit;
-  document.getElementById('thQty').textContent = t().th.qty;
-  document.getElementById('thCostUnit').textContent = t().th.costUnit;
-  document.getElementById('thTotalCost').textContent = t().th.totalCost;
-  document.getElementById('thPct').textContent = t().th.pct;
-  document.getElementById('thDiscount').textContent = t().th.discount;
-  document.getElementById('thExtra').textContent = t().th.extra;
-  document.getElementById('thMethod').textContent = t().th.method;
-  document.getElementById('thVat').textContent = t().th.vat;
-  document.getElementById('thProfit').textContent = t().th.profit;
-  document.getElementById('thPrice').textContent = t().th.price;
-  document.getElementById('thNotes').textContent = t().th.notes;
-  document.getElementById('thActions').textContent = t().th.actions;
+            items.forEach(item => {
+                const qty = parseFloat(item.quantity) || 0;
+                const costPerUnit = parseFloat(item.costPerUnit) || 0;
+                const pct = parseFloat(item.pct) || 0;
+                const discount = parseFloat(item.discount) || 0;
+                const extra = parseFloat(item.extra) || 0;
+                
+                // Base Cost
+                const baseCost = costPerUnit * qty;
+                
+                // Adjusted Cost
+                const extraCostsApplied = item.extraType === 'perunit' ? extra * qty : extra;
+                const discountApplied = item.discountType === 'percent' ? (baseCost * discount / 100) : discount;
+                
+                let adjustedCost = baseCost + extraCostsApplied - discountApplied;
+                adjustedCost = Math.max(0, adjustedCost); // Clamp to 0
+                
+                let profit, price;
 
-  document.getElementById('langToggle').textContent = t().langBtn;
-  document.getElementById('rateRefresh').textContent = t().rateBtn;
+                if (item.method === 'costplus') {
+                    profit = adjustedCost * (pct / 100);
+                    price = adjustedCost + profit;
+                } else if (item.method === 'margin') {
+                    if (pct >= 100) {
+                        alert(i18n[currentLang].validation.marginError);
+                        price = 0;
+                        profit = 0;
+                    } else {
+                        price = adjustedCost / (1 - pct / 100);
+                        profit = price - adjustedCost;
+                    }
+                }
+                
+                // Apply VAT
+                if (item.vatChecked) {
+                    price *= (1 + vatRate);
+                }
 
-  // fields
-  document.getElementById('vatRate').value = state.vatRate;
-  document.getElementById('projectName').value = state.projectName;
-  document.getElementById('currencySelect').value = state.currency;
-  document.getElementById('themeToggle').textContent = state.theme==='dark'? t().themeSun : t().themeMoon;
+                item.totalCost = baseCost;
+                item.adjustedCost = adjustedCost;
+                item.profit = profit;
+                item.finalPrice = price;
 
-  // project badge
-  document.getElementById('projectNameBadge').textContent = state.projectName || '';
+                // Accumulate totals
+                totalQty += qty;
+                totalCost += baseCost;
+                totalProfit += profit;
+                totalPrice += price;
+                totalDiscount += discountApplied;
+                totalExtra += extraCostsApplied;
+            });
 
-  // rows
-  const tbody = document.querySelector('#itemsTable tbody');
-  tbody.innerHTML = '';
-  let sumCost=0, sumProfit=0, sumPrice=0, sumQty=0, sumDisc=0, sumExtra=0;
+            // Update footer
+            totalQtyTd.textContent = totalQty.toFixed(0);
+            totalCostTd.textContent = (totalCost * currencyRate).toFixed(2);
+            totalProfitTd.textContent = (totalProfit * currencyRate).toFixed(2);
+            totalPriceTd.textContent = (totalPrice * currencyRate).toFixed(2);
+            totalDiscountTd.textContent = (totalDiscount * currencyRate).toFixed(2);
+            totalExtraTd.textContent = (totalExtra * currencyRate).toFixed(2);
+            
+            renderTable();
+            drawCharts();
+            saveState();
+        }
 
-  state.items.forEach((it,idx)=>{
-    const res = calcItem(it);
-    const adj = adjustedCost(it);
-    const totalCost = (Number(it.cost)||0) * (Number(it.qty)||0);
-    sumCost += totalCost; sumQty += Number(it.qty)||0;
-    sumProfit += res.valid ? res.profit : 0;
-    sumPrice += res.valid ? res.price : adj;
-    // approx totals for shown columns:
-    // discount value for summary (display only, not column per se)
-    // compute discount as applied:
-    let discVal = 0;
-    const base = totalCost;
-    if (it.discountType==='percent'){ discVal = base * ((Number(it.discount)||0)/100); }
-    else { discVal = Number(it.discount)||0; }
-    sumDisc += Math.max(discVal,0);
-    const extraVal = it.extraType==='perunit' ? (Number(it.extra)||0) * (Number(it.qty)||0) : (Number(it.extra)||0);
-    sumExtra += Math.max(extraVal,0);
+        // Table Rendering
+        function renderTable() {
+            itemsTableBody.innerHTML = '';
+            items.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.dataset.index = index;
 
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${idx+1}</td>
-      <td><input data-k="name" value="${it.name||''}"/></td>
-      <td>
-        <select data-k="unit">
-          ${['قطعة','متر','طن','Piece','Meter','Ton'].map(v=>`<option ${it.unit===v?'selected':''}>${v}</option>`).join('')}
-        </select>
-      </td>
-      <td class="num"><input class="num" data-k="qty" type="number" min="0" step="1" value="${it.qty}"/></td>
-      <td class="num"><input class="num" data-k="cost" type="number" min="0" step="0.01" value="${it.cost}"/></td>
-      <td class="num">${money(totalCost*state.rate)}</td>
-      <td class="num"><input class="num" data-k="pct" type="number" min="0" max="99.99" step="0.01" value="${it.pct}"/></td>
-      <td class="num">
-        <div class="row">
-          <input class="num" data-k="discount" type="number" min="0" step="0.01" value="${it.discount}"/>
-          <select data-k="discountType" style="max-width:90px">
-            <option value="amount" ${it.discountType==='amount'?'selected':''}>${t().amount}</option>
-            <option value="percent" ${it.discountType==='percent'?'selected':''}>${t().percent}</option>
-          </select>
-        </div>
-      </td>
-      <td class="num">
-        <div class="row">
-          <input class="num" data-k="extra" type="number" min="0" step="0.01" value="${it.extra}"/>
-          <select data-k="extraType" style="max-width:120px">
-            <option value="total" ${it.extraType==='total'?'selected':''}>${t().extraTotal}</option>
-            <option value="perunit" ${it.extraType==='perunit'?'selected':''}>${t().extraPerUnit}</option>
-          </select>
-        </div>
-      </td>
-      <td>
-        <select data-k="method">
-          <option value="costplus" ${it.method==='costplus'?'selected':''}>${t().costplus}</option>
-          <option value="margin" ${it.method==='margin'?'selected':''}>${t().margin}</option>
-        </select>
-      </td>
-      <td class="num"><input type="checkbox" data-k="vat" ${it.vat?'checked':''}/></td>
-      <td class="num" style="${res.valid?'':'color:var(--danger)'}">${money((res.valid?res.profit:0)*state.rate)}</td>
-      <td class="num" style="${res.valid?'':'color:var(--danger)'}">${money((res.valid?res.price:adj)*state.rate)}</td>
-      <td><input data-k="notes" value="${it.notes||''}"/></td>
-      <td><button data-action="delete" class="danger">${t().delete}</button></td>
-    `;
-    // attach listeners for inline edits
-    tr.querySelectorAll('input,select').forEach(el=>{
-      const k = el.getAttribute('data-k');
-      if (!k) return;
-      el.addEventListener('input',()=>{
-        let v = (el.type==='checkbox') ? el.checked : el.value;
-        if (['qty','cost','pct','discount','extra'].includes(k)) v = Number(v);
-        it[k] = v;
-        save(); render(); drawCharts();
-      });
-    });
-    tr.querySelector('button[data-action="delete"]').addEventListener('click',()=>{
-      state.items.splice(idx,1); save(); render(); drawCharts();
-    });
-    tbody.appendChild(tr);
-  });
+                const tdTemplate = `
+                    <td>${index + 1}</td>
+                    <td><input type="text" class="edit-input" data-field="name" value="${item.name}"></td>
+                    <td><select class="edit-select" data-field="unit">${renderUnitOptions(item.unit)}</select></td>
+                    <td><input type="number" class="edit-input" data-field="quantity" value="${item.quantity}" min="0" step="1"></td>
+                    <td><input type="number" class="edit-input" data-field="costPerUnit" value="${item.costPerUnit}" min="0" step="0.01"></td>
+                    <td>${(item.totalCost * currencyRate).toFixed(2) || '0.00'}</td>
+                    <td><input type="number" class="edit-input" data-field="pct" value="${item.pct}" min="0" max="99.99" step="0.01"></td>
+                    <td>
+                        <input type="number" class="edit-input" data-field="discount" value="${item.discount}" min="0" step="0.01">
+                        <select class="edit-select" data-field="discountType">${renderDiscountTypeOptions(item.discountType)}</select>
+                    </td>
+                    <td>
+                        <input type="number" class="edit-input" data-field="extra" value="${item.extra}" min="0" step="0.01">
+                        <select class="edit-select" data-field="extraType">${renderExtraTypeOptions(item.extraType)}</select>
+                    </td>
+                    <td><select class="edit-select" data-field="method">${renderMethodOptions(item.method)}</select></td>
+                    <td><input type="checkbox" class="edit-checkbox" data-field="vatChecked" ${item.vatChecked ? 'checked' : ''}></td>
+                    <td>${(item.profit * currencyRate).toFixed(2) || '0.00'}</td>
+                    <td>${(item.finalPrice * currencyRate).toFixed(2) || '0.00'}</td>
+                    <td class="notes-cell"><input type="text" class="edit-input" data-field="notes" value="${item.notes}"></td>
+                    <td class="action-cell"><button class="delete-btn" onclick="deleteItem(${index})">${i18n[currentLang].clearAllBtn}</button></td>
+                `;
 
-  // totals row & KPI
-  document.getElementById('tTotalCost').textContent = money(sumCost*state.rate);
-  document.getElementById('tTotalProfit').textContent = money(sumProfit*state.rate);
-  document.getElementById('tTotalPrice').textContent = money(sumPrice*state.rate);
-  document.getElementById('tTotalDiscount').textContent = money(sumDisc*state.rate);
-  document.getElementById('tTotalExtra').textContent = money(sumExtra*state.rate);
+                tr.innerHTML = tdTemplate;
+                itemsTableBody.appendChild(tr);
 
-  document.getElementById('kpiCost').textContent = money(sumCost*state.rate);
-  document.getElementById('kpiProfit').textContent = money(sumProfit*state.rate);
-  document.getElementById('kpiPrice').textContent = money(sumPrice*state.rate);
-}
+                // Add event listeners to newly created inputs/selects
+                tr.querySelectorAll('.edit-input, .edit-select, .edit-checkbox').forEach(input => {
+                    input.addEventListener('change', (e) => handleInlineEdit(e, index));
+                    input.addEventListener('input', (e) => handleInlineEdit(e, index));
+                });
+            });
+        }
 
-/* ====== Charts ====== */
-let barChart, pieChart;
-function drawCharts(){
-  const labels = state.items.map(x=>x.name||'');
-  const costs = state.items.map(x=>(Number(x.cost)||0)*(Number(x.qty)||0)*state.rate);
-  const profits = state.items.map(x=> (calcItem(x).valid?calcItem(x).profit:0)*state.rate );
+        function handleInlineEdit(event, index) {
+            const field = event.target.dataset.field;
+            let value = event.target.value;
 
-  const barCtx = document.getElementById('chartBar');
-  const pieCtx = document.getElementById('chartPie');
+            if (event.target.type === 'number') {
+                value = parseFloat(value);
+            } else if (event.target.type === 'checkbox') {
+                value = event.target.checked;
+            }
 
-  if (barChart) barChart.destroy();
-  barChart = new Chart(barCtx, {
-    type:'bar',
-    data:{ labels, datasets:[
-      { label: (state.lang==='ar'?'التكلفة':'Cost'), data:costs },
-      { label: (state.lang==='ar'?'الربح':'Profit'), data:profits }
-    ]},
-    options:{ responsive:true, plugins:{legend:{position:'top'}}}
-  });
+            items[index][field] = value;
+            calculateAll();
+        }
 
-  if (pieChart) pieChart.destroy();
-  const sumProfit = profits.reduce((a,b)=>a+b,0);
-  const sumCost = costs.reduce((a,b)=>a+b,0);
-  pieChart = new Chart(pieCtx,{
-    type:'pie',
-    data:{ labels:[(state.lang==='ar'?'إجمالي التكلفة':'Total Cost'),(state.lang==='ar'?'إجمالي الربح':'Total Profit')],
-           datasets:[{ data:[sumCost,sumProfit] }] },
-    options:{ responsive:true }
-  });
-}
+        // Helper functions for options
+        function renderUnitOptions(selected) {
+            const units = { Piece: 'Piece', Meter: 'Meter', Ton: 'Ton' };
+            const options = Object.entries(units).map(([key, value]) =>
+                `<option value="${key}" ${key === selected ? 'selected' : ''}>${i18n[currentLang].units[key]}</option>`
+            );
+            return options.join('');
+        }
 
-/* ====== UI Actions ====== */
-document.getElementById('addItem').addEventListener('click',()=>{
-  const name = document.getElementById('itemName').value.trim();
-  const unit = document.getElementById('itemUnit').value;
-  const qty = Number(document.getElementById('itemQty').value)||0;
-  const cost = Number(document.getElementById('itemCost').value)||0;
-  const pct = Number(document.getElementById('itemPct').value)||0;
-  const discount = Number(document.getElementById('itemDiscount').value)||0;
-  const discountType = document.getElementById('itemDiscountType').value;
-  const extra = Number(document.getElementById('itemExtra').value)||0;
-  const extraType = document.getElementById('itemExtraType').value;
-  const method = document.getElementById('itemMethod').value;
-  const vat = document.getElementById('itemVat').checked;
-  const notes = document.getElementById('itemNotes').value||'';
+        function renderMethodOptions(selected) {
+            const methods = { costplus: 'costplus', margin: 'margin' };
+            const options = Object.entries(methods).map(([key, value]) =>
+                `<option value="${key}" ${key === selected ? 'selected' : ''}>${i18n[currentLang].methods[key]}</option>`
+            );
+            return options.join('');
+        }
 
-  if (!name){ alert(state.lang==='ar'?'أدخل اسم البند':'Enter item name'); return; }
-  if (method==='margin' && pct>=100){ alert(state.lang==='ar'?'نسبة الميرج يجب أن تكون أقل من 100%':'Margin must be < 100%'); return; }
+        function renderDiscountTypeOptions(selected) {
+            const types = { amount: 'amount', percent: 'percent' };
+            const options = Object.entries(types).map(([key, value]) =>
+                `<option value="${key}" ${key === selected ? 'selected' : ''}>${i18n[currentLang].discountTypes[key]}</option>`
+            );
+            return options.join('');
+        }
 
-  state.items.push({id:uid(), name, unit, qty, cost, pct, discount, discountType, extra, extraType, method, vat, notes});
-  save(); render(); drawCharts();
-  // reset quick inputs
-  document.getElementById('itemName').value='';
-  document.getElementById('itemNotes').value='';
-});
+        function renderExtraTypeOptions(selected) {
+            const types = { total: 'total', perunit: 'perunit' };
+            const options = Object.entries(types).map(([key, value]) =>
+                `<option value="${key}" ${key === selected ? 'selected' : ''}>${i18n[currentLang].extraTypes[key]}</option>`
+            );
+            return options.join('');
+        }
 
-document.getElementById('calcAll').addEventListener('click',()=>{ render(); drawCharts(); });
+        function addItem() {
+            items.push({
+                name: "",
+                unit: "Piece",
+                quantity: 0,
+                costPerUnit: 0,
+                pct: 0,
+                discount: 0,
+                discountType: "amount",
+                extra: 0,
+                extraType: "total",
+                method: "costplus",
+                vatChecked: false,
+                notes: "",
+                totalCost: 0,
+                profit: 0,
+                finalPrice: 0
+            });
+            renderTable();
+            saveState();
+        }
 
-document.getElementById('clearAll').addEventListener('click',()=>{
-  if (!confirm(state.lang==='ar'?'متأكد من مسح جميع البنود؟':'Clear all items?')) return;
-  state.items = []; save(); render(); drawCharts();
-});
+        function deleteItem(index) {
+            items.splice(index, 1);
+            calculateAll();
+        }
 
-document.getElementById('projectName').addEventListener('input', (e)=>{ state.projectName = e.target.value; save(); render(); });
+        function clearAll() {
+            items = [];
+            renderTable();
+            calculateAll();
+            saveState();
+        }
 
-document.getElementById('vatRate').addEventListener('input',(e)=>{
-  const v = Number(e.target.value)||0; state.vatRate = v; save(); render(); drawCharts();
-});
+        // Import/Export
+        function downloadTemplate() {
+            const headers = ["name", "unit", "qty", "costPerUnit", "pct", "discount", "discountType", "extra", "extraType", "method", "vat", "notes"];
+            const ws = XLSX.utils.aoa_to_sheet([headers]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, i18n[currentLang].validation.template);
+            XLSX.writeFile(wb, `${i18n[currentLang].validation.template}.xlsx`);
+        }
 
-/* ====== Lang & Theme ====== */
-document.getElementById('langToggle').addEventListener('click',()=>{
-  state.lang = state.lang==='ar'?'en':'ar';
-  save(); setDir(); render(); drawCharts();
-});
-document.getElementById('themeToggle').addEventListener('click',()=>{
-  state.theme = state.theme==='dark'?'light':'dark';
-  if (state.theme==='dark') document.documentElement.classList.add('dark');
-  else document.documentElement.classList.remove('dark');
-  save(); render(); drawCharts();
-});
+        function importExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-/* ====== Currency ====== */
-document.getElementById('currencySelect').addEventListener('change',(e)=>{
-  state.currency = e.target.value; save(); fetchRate();
-});
-document.getElementById('rateRefresh').addEventListener('click', fetchRate);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[sheetName];
+                const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-/* ====== Excel Export / Import ====== */
-document.getElementById('downloadTemplate').addEventListener('click', ()=>{
-  const headers = [["name","unit","qty","cost","pct","discount","discountType","extra","extraType","method","vat","notes"]];
-  const ws = XLSX.utils.aoa_to_sheet(headers);
-  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Template");
-  XLSX.writeFile(wb, "contractor_profit_template.xlsx");
-});
-document.getElementById('importExcel').addEventListener('click', ()=> document.getElementById('excelInput').click());
-document.getElementById('excelInput').addEventListener('change', (e)=>{
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (evt)=>{
-    const data = new Uint8Array(evt.target.result);
-    const wb = XLSX.read(data, {type:'array'});
-    const ws = wb.Sheets[wb.SheetNames[0]];
-    const json = XLSX.utils.sheet_to_json(ws, {defval:''});
-    json.forEach(r=>{
-      const it = {
-        id: uid(),
-        name: r.name||'',
-        unit: r.unit||'قطعة',
-        qty: Number(r.qty)||0,
-        cost: Number(r.cost)||0,
-        pct: Number(r.pct)||0,
-        discount: Number(r.discount)||0,
-        discountType: (r.discountType==='percent'?'percent':'amount'),
-        extra: Number(r.extra)||0,
-        extraType: (r.extraType==='perunit'?'perunit':'total'),
-        method: (r.method==='margin'?'margin':'costplus'),
-        vat: String(r.vat).toLowerCase()==='false'? false : true,
-        notes: r.notes||''
-      };
-      if (it.name) state.items.push(it);
-    });
-    save(); render(); drawCharts();
-    e.target.value='';
-  };
-  reader.readAsArrayBuffer(file);
-});
+                if (json.length < 2) {
+                    alert(i18n[currentLang].validation.importError);
+                    return;
+                }
 
-document.getElementById('exportExcel').addEventListener('click', ()=>{
-  const rows = state.items.map((it)=>{
-    const res = calcItem(it);
-    const totalCost = (Number(it.cost)||0)*(Number(it.qty)||0);
-    return {
-      name: it.name, unit: it.unit, qty: it.qty, cost_unit: it.cost, total_cost: totalCost,
-      pct: it.pct, discount: it.discount, discountType: it.discountType, extra: it.extra, extraType: it.extraType,
-      method: it.method, vat: it.vat, profit: res.valid?res.profit:0, final_price: res.valid?res.price:adjustedCost(it),
-      notes: it.notes
-    };
-  });
-  const ws = XLSX.utils.json_to_sheet(rows);
-  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Items");
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
-    ['Project', state.projectName],
-    ['Currency', state.currency],
-    ['Rate', state.rate],
-    ['VAT %', state.vatRate]
-  ]), "Summary");
-  XLSX.writeFile(wb, "contractor_profit.xlsx");
-});
+                const headers = json[0];
+                const rows = json.slice(1);
+                
+                const newItems = rows.map(row => {
+                    const item = {};
+                    headers.forEach((header, index) => {
+                        item[header] = row[index] || '';
+                    });
+                    
+                    // Coerce types
+                    item.quantity = parseFloat(item.qty) || 0;
+                    item.costPerUnit = parseFloat(item.costPerUnit) || 0;
+                    item.pct = parseFloat(item.pct) || 0;
+                    item.discount = parseFloat(item.discount) || 0;
+                    item.extra = parseFloat(item.extra) || 0;
+                    item.vatChecked = item.vat === true || item.vat === 'TRUE' || item.vat === 'true' || item.vat === 1;
+                    
+                    return {
+                        name: item.name,
+                        unit: item.unit,
+                        quantity: item.quantity,
+                        costPerUnit: item.costPerUnit,
+                        pct: item.pct,
+                        discount: item.discount,
+                        discountType: item.discountType,
+                        extra: item.extra,
+                        extraType: item.extraType,
+                        method: item.method,
+                        vatChecked: item.vatChecked,
+                        notes: item.notes
+                    };
+                });
 
-/* ====== PDF ====== */
-document.getElementById('exportPDF').addEventListener('click', ()=>{
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('l','pt','a4');
-  const title = (state.lang==='ar'?'تقرير حسبة ربح المقاول':'Contractor Profit Report');
-  doc.setFontSize(14); doc.text(title, 40, 30);
-  doc.setFontSize(11);
-  doc.text(`${t().project}: ${state.projectName||'-'}`, 40, 50);
-  doc.text(t().rateInfo(`${state.baseCurrency}→${state.currency}`, state.rate), 40, 70);
-  doc.text(`${t().vatRate}: ${state.vatRate}%`, 40, 90);
+                items = newItems;
+                calculateAll();
+                alert(i18n[currentLang].validation.importSuccess);
+            };
+            reader.readAsArrayBuffer(file);
+        }
 
-  const head = [[ '#', t().th.item, t().th.unit, t().th.qty, t().th.costUnit, t().th.totalCost, t().th.pct, t().th.discount, t().th.extra, t().th.method, t().th.vat, t().th.profit, t().th.price, t().th.notes ]];
-  const body = state.items.map((it, idx)=>{
-    const res = calcItem(it);
-    const totalCost = (Number(it.cost)||0)*(Number(it.qty)||0);
-    const price = res.valid?res.price:adjustedCost(it);
-    const profit = res.valid?res.profit:0;
-    return [
-      idx+1, it.name, it.unit, it.qty, money(it.cost), money(totalCost),
-      money(it.pct), (it.discountType==='percent'? it.discount+'%': money(it.discount)),
-      (it.extraType==='perunit'? (money(it.extra)+'/'+(state.lang==='ar'?'وحدة':'unit')): money(it.extra)),
-      (it.method==='margin'? t().margin : t().costplus), (it.vat?'✓':'-'),
-      money(profit), money(price), (it.notes||'')
-    ];
-  });
-  doc.autoTable({
-    head, body, startY: 110, styles:{fontSize:9},
-    headStyles:{fillColor:[37,99,235]}, theme:'grid'
-  });
+        function exportExcel() {
+            const data = items.map(item => ({
+                'Name': item.name,
+                'Unit': i18n[currentLang].units[item.unit],
+                'Qty': item.quantity,
+                'Cost/Unit': item.costPerUnit,
+                'Total Cost (SAR)': item.totalCost,
+                'Total Cost': (item.totalCost * currencyRate).toFixed(2),
+                'Percentage': item.pct,
+                'Discount': item.discount,
+                'Discount Type': i18n[currentLang].discountTypes[item.discountType],
+                'Extra Costs': item.extra,
+                'Extra Type': i18n[currentLang].extraTypes[item.extraType],
+                'Method': i18n[currentLang].methods[item.method],
+                'VAT Applied': item.vatChecked,
+                'Profit (SAR)': item.profit.toFixed(2),
+                'Profit': (item.profit * currencyRate).toFixed(2),
+                'Final Price (SAR)': item.finalPrice.toFixed(2),
+                'Final Price': (item.finalPrice * currencyRate).toFixed(2),
+                'Notes': item.notes
+            }));
 
-  // totals
-  const sum = (arr, f)=>arr.reduce((a,x)=>a+f(x),0);
-  const tc = sum(state.items, x=>(Number(x.cost)||0)*(Number(x.qty)||0));
-  const tp = sum(state.items, x=> (calcItem(x).valid?calcItem(x).profit:0) );
-  const tpr = sum(state.items, x=> (calcItem(x).valid?calcItem(x).price:adjustedCost(x)) );
-  const y = doc.lastAutoTable.finalY + 20;
-  doc.setFontSize(12);
-  doc.text(`${t().kpiCost}: ${money(tc)}`, 40, y);
-  doc.text(`${t().kpiProfit}: ${money(tp)}`, 220, y);
-  doc.text(`${t().kpiPrice}: ${money(tpr)}`, 400, y);
+            const ws = XLSX.utils.json_to_sheet(data);
+            const summaryData = [
+                ["Project Name", projectNameInput.value],
+                ["Currency", currencySelect.value],
+                ["Exchange Rate (1 SAR)", currencyRate.toFixed(4)],
+                ["VAT Rate", vatRateInput.value + "%"],
+            ];
+            const wsSummary = XLSX.utils.aoa_to_sheet(summaryData);
 
-  doc.save('contractor_profit.pdf');
-});
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Items & Results");
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
+            
+            XLSX.writeFile(wb, `Profit Report - ${projectNameInput.value || 'Project'}.xlsx`);
+        }
 
-document.getElementById('printReport').addEventListener('click', ()=> window.print());
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+            
+            const headers = i18n[currentLang].tableHeaders.filter(h => h !== "Actions");
+            const data = items.map((item, index) => [
+                index + 1,
+                item.name,
+                i18n[currentLang].units[item.unit],
+                item.quantity,
+                (item.costPerUnit * currencyRate).toFixed(2),
+                (item.totalCost * currencyRate).toFixed(2),
+                item.pct,
+                (item.discount * currencyRate).toFixed(2),
+                (item.extra * currencyRate).toFixed(2),
+                i18n[currentLang].methods[item.method],
+                item.vatChecked ? "Yes" : "No",
+                (item.profit * currencyRate).toFixed(2),
+                (item.finalPrice * currencyRate).toFixed(2),
+                item.notes
+            ]);
+            
+            const totals = [
+                i18n[currentLang].totalLabel,
+                '',
+                '',
+                totalQtyTd.textContent,
+                '',
+                totalCostTd.textContent,
+                '',
+                totalDiscountTd.textContent,
+                totalExtraTd.textContent,
+                '',
+                '',
+                totalProfitTd.textContent,
+                totalPriceTd.textContent,
+                ''
+            ];
+            data.push(totals);
 
-/* ====== Init ====== */
-function applyTheme(){
-  if (state.theme==='dark') document.documentElement.classList.add('dark');
-  else document.documentElement.classList.remove('dark');
-}
-function init(){
-  applyTheme(); setDir(); render(); drawCharts(); updateRateInfo();
-  // set selects
-  document.getElementById('currencySelect').value = state.currency;
-  // first rate fetch (non-blocking)
-  fetchRate();
-}
-init();
-</script>
+            doc.text(i18n[currentLang].headerTitle, 14, 20);
+            doc.setFontSize(10);
+            doc.text(`${i18n[currentLang].projectNameLabel}: ${projectNameInput.value}`, 14, 28);
+            doc.text(`${i18n[currentLang].currencyLabel}: ${currencySelect.value}, Rate: ${currencyRate.toFixed(4)}`, 14, 34);
+            doc.text(`${i18n[currentLang].vatRateLabel}: ${vatRateInput.value}%`, 14, 40);
+
+            doc.autoTable({
+                startY: 50,
+                head: [headers],
+                body: data,
+                styles: {
+                    font: "helvetica",
+                    fontSize: 8,
+                },
+                headStyles: {
+                    fillColor: [41, 128, 185],
+                    textColor: 255
+                },
+                didDrawPage: (data) => {
+                    // RTL support
+                    if (currentLang === 'ar') {
+                        doc.setRTL(true);
+                        data.table.columns.forEach(col => col.styles.halign = 'right');
+                    }
+                }
+            });
+
+            doc.save(`Profit Report - ${projectNameInput.value || 'Project'}.pdf`);
+        }
+
+        // Charts
+        function drawCharts() {
+            const itemNames = items.map(item => item.name || `Item ${items.indexOf(item) + 1}`);
+            const itemCosts = items.map(item => item.totalCost * currencyRate);
+            const itemProfits = items.map(item => item.profit * currencyRate);
+            
+            const totalCost = itemCosts.reduce((a, b) => a + b, 0);
+            const totalProfit = itemProfits.reduce((a, b) => a + b, 0);
+            
+            const chartFontColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-text').trim();
+            const chartGridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid').trim();
+
+            if (barChartInstance) barChartInstance.destroy();
+            barChartInstance = new Chart(costProfitBarChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: itemNames,
+                    datasets: [
+                        {
+                            label: i18n[currentLang].tableHeaders[5],
+                            data: itemCosts,
+                            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                            borderColor: 'rgb(54, 162, 235)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: i18n[currentLang].tableHeaders[11],
+                            data: itemProfits,
+                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                            borderColor: 'rgb(75, 192, 192)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            ticks: { color: chartFontColor },
+                            grid: { color: chartGridColor }
+                        },
+                        y: {
+                            ticks: { color: chartFontColor },
+                            grid: { color: chartGridColor }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: chartFontColor
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: i18n[currentLang].chartLabels.costVsProfit,
+                            color: chartFontColor
+                        }
+                    }
+                }
+            });
+
+            if (pieChartInstance) pieChartInstance.destroy();
+            pieChartInstance = new Chart(costProfitPieChartCanvas, {
+                type: 'pie',
+                data: {
+                    labels: [i18n[currentLang].chartLabels.totalCost, i18n[currentLang].chartLabels.totalProfit],
+                    datasets: [{
+                        data: [totalCost, totalProfit],
+                        backgroundColor: ['rgba(255, 99, 132, 0.5)', 'rgba(54, 162, 235, 0.5)'],
+                        borderColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: chartFontColor
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: i18n[currentLang].chartLabels.totalCostVsProfit,
+                            color: chartFontColor
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 </body>
 </html>
+
