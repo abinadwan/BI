@@ -47,13 +47,14 @@ html.dark {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: 'InterLocal', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
   margin: 0;
   padding: 20px;
   transition: background-color 0.3s, color 0.3s;
 }
+html[dir="rtl"] body { font-family: 'Almarai', 'InterLocal', Arial, sans-serif; }
 
 .container {
   max-width: 1200px;
@@ -222,4 +223,25 @@ html[dir="rtl"] .close-btn { float: left; }
   table { font-size: 10px; }
   th, td { border: 1px solid #000; padding: 5px; }
   thead th, tfoot td { background-color: #f0f0f0; position: static; }
+/* Local fonts */
+@font-face {
+  font-family: 'Almarai';
+  src: url('fonts/Almarai-Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Almarai';
+  src: url('fonts/Almarai-Bold.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'InterLocal';
+  src: url('fonts/Inter-Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'InterLocal';
+  src: url('fonts/Inter-Bold.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
 }

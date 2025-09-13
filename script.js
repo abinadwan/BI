@@ -184,6 +184,7 @@ const App = {
 
   // Init
   init() {
+    this.ensureI18nKeys();
     this.loadState();
     this.bindEvents();
     this.setLanguage();
@@ -204,6 +205,10 @@ const App = {
     document.getElementById('refreshRateBtn').addEventListener('click', () => this.updateCurrencyRates());
     document.getElementById('clearAllBtn').addEventListener('click', () => this.clearAll());
     document.getElementById('exportExcelBtn').addEventListener('click', () => this.exportExcel());
+    const summaryBtn = document.getElementById('summaryPdfBtn');
+    if (summaryBtn) summaryBtn.addEventListener('click', () => this.exportPDFByTemplate('summary'));
+    const detailedBtn = document.getElementById('detailedPdfBtn');
+    if (detailedBtn) detailedBtn.addEventListener('click', () => this.exportPDFByTemplate('detailed'));
     const exportPdfBtn = document.getElementById('exportPDFBtn');
     if (exportPdfBtn) exportPdfBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -270,6 +275,7 @@ const App = {
 
   // Lang & Theme
   setLanguage() {
+    this.ensureI18nKeys();
     this.state.currentLang = this.elements.langToggle.checked ? 'ar' : 'en';
     document.documentElement.setAttribute('dir', this.state.currentLang === 'ar' ? 'rtl' : 'ltr');
     document.documentElement.setAttribute('lang', this.state.currentLang === 'ar' ? 'ar' : 'en');
@@ -307,8 +313,45 @@ const App = {
     this.renderTable();
     this.drawCharts();
     this.updateRateInfo();
-    this.updateModalTexts();
-    this.saveState();
+      this.updateModalTexts();
+      this.saveState();
+  },
+  // Ensure required i18n keys for PDF UI exist
+  ensureI18nKeys() {
+    const en = this.i18n.en || (this.i18n.en = {});
+    const ar = this.i18n.ar || (this.i18n.ar = {});
+    Object.assign(en, {
+      previewPdfBtn: en.previewPdfBtn || 'Preview PDF',
+      pdfOptionsTitle: en.pdfOptionsTitle || 'PDF Options',
+      showHeaderLabel: en.showHeaderLabel || 'Show Header',
+      showFooterLabel: en.showFooterLabel || 'Show Footer',
+      showLogoLabel: en.showLogoLabel || 'Show Logo',
+      showTotalsLabel: en.showTotalsLabel || 'Show Totals Row',
+      embedChartsLabel: en.embedChartsLabel || 'Embed Charts',
+      includeColumnsLabel: en.includeColumnsLabel || 'Columns',
+      orientationLabel: en.orientationLabel || 'Orientation',
+      portrait: en.portrait || 'Portrait',
+      landscape: en.landscape || 'Landscape',
+      summaryPdfBtn: en.summaryPdfBtn || 'Summary Report (PDF)',
+      detailedPdfBtn: en.detailedPdfBtn || 'Detailed Report (PDF)',
+      projectDescLabel: en.projectDescLabel || 'Project Description'
+    });
+    Object.assign(ar, {
+      previewPdfBtn: ar.previewPdfBtn || 'معاينة PDF',
+      pdfOptionsTitle: ar.pdfOptionsTitle || 'خيارات PDF',
+      showHeaderLabel: ar.showHeaderLabel || 'إظهار الترويسة',
+      showFooterLabel: ar.showFooterLabel || 'إظهار التذييل',
+      showLogoLabel: ar.showLogoLabel || 'إظهار الشعار',
+      showTotalsLabel: ar.showTotalsLabel || 'إظهار صف الإجماليات',
+      embedChartsLabel: ar.embedChartsLabel || 'إدراج الرسوم البيانية',
+      includeColumnsLabel: ar.includeColumnsLabel || 'الأعمدة',
+      orientationLabel: ar.orientationLabel || 'الاتجاه',
+      portrait: ar.portrait || 'عمودي',
+      landscape: ar.landscape || 'أفقي',
+      summaryPdfBtn: ar.summaryPdfBtn || 'تقرير مختصر (PDF)',
+      detailedPdfBtn: ar.detailedPdfBtn || 'تقرير تفصيلي (PDF)',
+      projectDescLabel: ar.projectDescLabel || 'وصف المشروع'
+    });
   },
   setTheme() {
     this.state.currentTheme = this.elements.themeToggle.checked ? 'dark' : 'light';
@@ -887,8 +930,19 @@ const App = {
           doc.addFont('AppFont-Regular.ttf', 'AppFont', 'normal');
           doc.addFont('AppFont-Bold.ttf', 'AppFont', 'bold');
           doc.setFont('AppFont', 'normal');
-        } catch (e) {
-          doc.setFont('helvetica', 'normal');
+        } catch (e1) {
+          try {
+            // Fallback: use Almarai even for EN if no Latin font provided
+            const reg = await this.loadFontAsBase64('fonts/Almarai-Regular.ttf');
+            const bold = await this.loadFontAsBase64('fonts/Almarai-Bold.ttf');
+            doc.addFileToVFS('AppFont-Regular.ttf', reg);
+            doc.addFileToVFS('AppFont-Bold.ttf', bold);
+            doc.addFont('AppFont-Regular.ttf', 'AppFont', 'normal');
+            doc.addFont('AppFont-Bold.ttf', 'AppFont', 'bold');
+            doc.setFont('AppFont', 'normal');
+          } catch (e2) {
+            doc.setFont('helvetica', 'normal');
+          }
         }
       }
     } catch (e) { console.warn('PDF fonts fallback', e); }
