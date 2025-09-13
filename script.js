@@ -202,11 +202,12 @@ const App = {
 
             // Rebuild nav with 4 stages (Arabic labels)
             nav.setAttribute('aria-label', 'مراحل التطبيق');
+            nav.setAttribute('role', 'tablist');
             nav.innerHTML = [
-                '<button class="ax-tab" data-target="stage1" aria-selected="true">المرحلة ١: تفاصيل المشروع</button>',
-                '<button class="ax-tab" data-target="stage2">المرحلة ٢: البنود</button>',
-                '<button class="ax-tab" data-target="stage3">المرحلة ٣: التقارير</button>',
-                '<button class="ax-tab" data-target="stage4">المرحلة ٤: لوحة المؤشرات</button>'
+                '<button class="ax-tab" id="tab-stage1" role="tab" data-target="stage1" aria-controls="panel-stage1" aria-selected="true">المرحلة ١: تفاصيل المشروع</button>',
+                '<button class="ax-tab" id="tab-stage2" role="tab" data-target="stage2" aria-controls="panel-stage2" aria-selected="false">المرحلة ٢: البنود</button>',
+                '<button class="ax-tab" id="tab-stage3" role="tab" data-target="stage3" aria-controls="panel-stage3" aria-selected="false">المرحلة ٣: التقارير</button>',
+                '<button class="ax-tab" id="tab-stage4" role="tab" data-target="stage4" aria-controls="panel-stage4" aria-selected="false">المرحلة ٤: لوحة المؤشرات</button>'
             ].join('');
 
             // Map existing panels to stages
@@ -216,12 +217,45 @@ const App = {
                 const panel = titleEl.closest('.ax-tabs-panel');
                 if (!panel) return;
                 panel.setAttribute('data-tab', stage);
+                panel.setAttribute('id', `panel-${stage}`);
+                panel.setAttribute('role', 'tabpanel');
+                panel.setAttribute('aria-labelledby', `tab-${stage}`);
                 panel.classList.toggle('ax-active', makeActive);
+                panel.toggleAttribute('hidden', !makeActive);
             };
             mapPanel('project-details-title', 'stage1', true);
             mapPanel('item-management-title', 'stage2');
             mapPanel('report-management-title', 'stage3');
             mapPanel('charts-title', 'stage4');
+
+            // Ensure initial tab focusability
+            const tabs = nav.querySelectorAll('.ax-tab');
+            tabs.forEach(tab => tab.setAttribute('tabindex', tab.getAttribute('aria-selected') === 'true' ? '0' : '-1'));
+
+            // Fix inline styles and missing accessible names
+            const fileInput = document.getElementById('importExcelInput');
+            if (fileInput) {
+                fileInput.classList.add('d-none');
+                fileInput.removeAttribute('style');
+                fileInput.setAttribute('aria-hidden', 'true');
+            }
+            const saveBtn = document.getElementById('saveItemBtn');
+            if (saveBtn) {
+                saveBtn.classList.add('mt-15');
+                saveBtn.removeAttribute('style');
+            }
+            const discountTypeSel = document.getElementById('itemDiscountTypeModal');
+            if (discountTypeSel && !discountTypeSel.hasAttribute('aria-label')) {
+                discountTypeSel.setAttribute('aria-label', 'Discount Type');
+            }
+            const extraTypeSel = document.getElementById('itemExtraTypeModal');
+            if (extraTypeSel && !extraTypeSel.hasAttribute('aria-label')) {
+                extraTypeSel.setAttribute('aria-label', 'Extra Type');
+            }
+            const themeT = document.getElementById('themeToggle');
+            if (themeT && !themeT.hasAttribute('aria-label')) themeT.setAttribute('aria-label', 'Dark Mode');
+            const langT = document.getElementById('langToggle');
+            if (langT && !langT.hasAttribute('aria-label')) langT.setAttribute('aria-label', 'Language');
         } catch (e) {
             console.error('Failed to set up stages', e);
         }
@@ -893,16 +927,36 @@ const App = {
 document.addEventListener('DOMContentLoaded', () => App.init());
 
 document.addEventListener('DOMContentLoaded', () => {
+    const nav = document.querySelector('.ax-tabs-nav');
+    if (nav && !nav.hasAttribute('role')) nav.setAttribute('role', 'tablist');
+
     const axTabs = document.querySelectorAll('.ax-tab');
     const axPanels = document.querySelectorAll('.ax-tabs-panel');
+
+    // Ensure roles and associations
+    axTabs.forEach((tab) => {
+        if (!tab.hasAttribute('role')) tab.setAttribute('role', 'tab');
+        // Link tabs to panels by data-target -> data-tab
+        const target = tab.getAttribute('data-target');
+        const panel = Array.from(axPanels).find(p => p.getAttribute('data-tab') === target);
+        if (panel) {
+            if (!panel.id) panel.id = `ax-panel-${target}`;
+            tab.setAttribute('aria-controls', panel.id);
+            panel.setAttribute('role', 'tabpanel');
+            panel.setAttribute('aria-labelledby', tab.id || `ax-tab-${target}`);
+        }
+    });
 
     function axActivate(target) {
         axTabs.forEach(tab => {
             const selected = tab.getAttribute('data-target') === target;
             tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+            tab.setAttribute('tabindex', selected ? '0' : '-1');
         });
         axPanels.forEach(panel => {
-            panel.classList.toggle('ax-active', panel.getAttribute('data-tab') === target);
+            const isActive = panel.getAttribute('data-tab') === target;
+            panel.classList.toggle('ax-active', isActive);
+            panel.toggleAttribute('hidden', !isActive);
         });
     }
 

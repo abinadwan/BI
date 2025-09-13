@@ -3,58 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="app-title">حاسبة التكلفة التقديرية للمواد | Material Cost Estimator</title>
+    <title id="app-title">Material Cost Estimator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <meta name="color-scheme" content="light dark">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Material Cost Estimator">
+    <meta name="theme-color" content="#007bff">
 </head>
 <body>
     <div class="container">
-        <nav class="ax-tabs-nav" dir="rtl" aria-label="التنقل بين الأقسام">
-            <button class="ax-tab" data-target="الخدمات" aria-selected="true">الخدمات</button>
-            <button class="ax-tab" data-target="تفاصيل المشروع">تفاصيل المشروع</button>
-            <button class="ax-tab" data-target="إدارة البنود">إدارة البنود</button>
-            <button class="ax-tab" data-target="إدارة التقارير">إدارة التقارير</button>
-            <button class="ax-tab" data-target="الرسوم البيانية">الرسوم البيانية</button>
+        <header>
+            <div class="top-bar">
+                <div class="button-group">
+                    <label for="themeToggle" id="theme-label">Dark Mode</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="themeToggle" aria-label="Dark Mode">
+                        <span class="slider"></span>
+                    </label>
+                    <label for="langToggle" id="lang-label">English</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="langToggle" aria-label="Language">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            <div class="logo-container">
+                <img src="logo2.png" alt="Logo">
+                <h1 class="service-name">Material Cost Estimator</h1>
+            </div>
+        </header>
+
+        <nav class="ax-tabs-nav" dir="rtl" aria-label="مراحل التطبيق" role="tablist">
+            <button class="ax-tab" id="tab-stage1" role="tab" data-target="stage1" aria-controls="panel-stage1" aria-selected="true">المرحلة ١: تفاصيل المشروع</button>
+            <button class="ax-tab" id="tab-stage2" role="tab" data-target="stage2" aria-controls="panel-stage2" aria-selected="false">المرحلة ٢: البنود</button>
+            <button class="ax-tab" id="tab-stage3" role="tab" data-target="stage3" aria-controls="panel-stage3" aria-selected="false">المرحلة ٣: التقارير</button>
+            <button class="ax-tab" id="tab-stage4" role="tab" data-target="stage4" aria-controls="panel-stage4" aria-selected="false">المرحلة ٤: لوحة المؤشرات</button>
         </nav>
 
-        <div class="ax-tabs-panel" data-tab="الخدمات">
-            <header>
-                <div class="top-bar">
-                    <div class="button-group">
-                        <label for="themeToggle" id="theme-label"></label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="themeToggle">
-                            <span class="slider"></span>
-                        </label>
-                        <label for="langToggle" id="lang-label"></label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="langToggle">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
-                <div class="logo-container">
-                    <img src="logo2.png" alt="Logo">
-                    <h1 class="service-name">حاسبة التكلفة التقديرية</h1>
-                </div>
-            </header>
-        </div>
-
-        <div class="ax-tabs-panel" data-tab="تفاصيل المشروع">
+        <div class="ax-tabs-panel ax-active" id="panel-stage1" role="tabpanel" aria-labelledby="tab-stage1" data-tab="stage1">
             <section class="controls-container">
                 <h2><span id="project-details-title">Project Details</span></h2>
                 <div class="controls-grid">
                     <div class="form-group">
                         <label for="projectName" id="project-name-label">Project Name</label>
-                        <input type="text" id="projectName">
+                        <input type="text" id="projectName" placeholder="Enter project name">
                     </div>
                     <div class="form-group">
                         <label for="vatRate" id="vat-rate-label">VAT Rate %</label>
-                        <input type="number" id="vatRate" value="15" min="0" step="0.01">
+                        <input type="number" id="vatRate" value="15" min="0" step="0.01" placeholder="15">
                     </div>
                     <div class="form-group">
                         <label for="currencySelect" id="currency-label">Currency</label>
-                        <select id="currencySelect">
+                        <select id="currencySelect" title="Currency">
                             <option value="SAR">SAR</option>
                             <option value="USD">USD</option>
                             <option value="EUR">EUR</option>
@@ -68,7 +69,7 @@
             </section>
         </div>
 
-        <div class="ax-tabs-panel" data-tab="إدارة البنود">
+        <div class="ax-tabs-panel" id="panel-stage2" role="tabpanel" aria-labelledby="tab-stage2" data-tab="stage2" hidden>
             <section class="controls-container">
                 <h2><span id="item-management-title">Item Management</span></h2>
                 <div class="button-group">
@@ -98,8 +99,7 @@
                             <th class="action-cell">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="itemsTableBody">
-                        </tbody>
+                    <tbody id="itemsTableBody"></tbody>
                     <tfoot id="table-footer">
                         <tr class="total-row">
                             <td colspan="3"><span id="total-label">Totals</span></td>
@@ -121,7 +121,7 @@
             </section>
         </div>
 
-        <div class="ax-tabs-panel" data-tab="إدارة التقارير">
+        <div class="ax-tabs-panel" id="panel-stage3" role="tabpanel" aria-labelledby="tab-stage3" data-tab="stage3" hidden>
             <section class="controls-container">
                 <h2><span id="report-management-title">Report Management</span></h2>
                 <div class="button-group">
@@ -129,13 +129,13 @@
                     <button id="exportPDFBtn" class="action-button"><i class="fas fa-file-pdf"></i> <span id="export-pdf-btn">Export PDF</span></button>
                     <button id="printBtn" class="action-button"><i class="fas fa-print"></i> <span id="print-btn">Print Report</span></button>
                     <button id="downloadTemplateBtn" class="action-button"><i class="fas fa-download"></i> <span id="download-template-btn">Download Excel Template</span></button>
-                    <input type="file" id="importExcelInput" accept=".xlsx, .xls" style="display: none;">
+                    <input type="file" id="importExcelInput" accept=".xlsx, .xls" class="d-none" aria-hidden="true">
                     <button id="importExcelBtn" class="action-button"><i class="fas fa-file-import"></i> <span id="import-excel-btn">Import Excel</span></button>
                 </div>
             </section>
         </div>
 
-        <div class="ax-tabs-panel" data-tab="الرسوم البيانية">
+        <div class="ax-tabs-panel" id="panel-stage4" role="tabpanel" aria-labelledby="tab-stage4" data-tab="stage4" hidden>
             <section class="charts-container">
                 <h2><span id="charts-title">Charts</span></h2>
                 <div id="chart-container">
@@ -154,9 +154,9 @@
         </div>
     </div>
 
-    <div id="itemModal" class="modal">
+    <div id="itemModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div class="modal-content">
-            <span class="close-btn" id="closeModalBtn">&times;</span>
+            <span class="close-btn" id="closeModalBtn" aria-label="Close">&times;</span>
             <h3 id="modal-title">Add New Item</h3>
             <div class="form-group">
                 <label for="itemNameModal" id="item-name-label-modal">Item Name</label>
@@ -183,12 +183,12 @@
             <div class="form-group">
                 <label for="itemDiscountModal" id="discount-label-modal">Discount</label>
                 <input type="text" id="itemDiscountModal" class="numeric-input" inputmode="decimal">
-                <select id="itemDiscountTypeModal"></select>
+                <select id="itemDiscountTypeModal" aria-label="Discount Type"></select>
             </div>
             <div class="form-group">
                 <label for="itemExtraModal" id="extra-label-modal">Extra Costs</label>
                 <input type="text" id="itemExtraModal" class="numeric-input" inputmode="decimal">
-                <select id="itemExtraTypeModal"></select>
+                <select id="itemExtraTypeModal" aria-label="Extra Type"></select>
             </div>
             <div class="form-group">
                 <label for="itemMethodModal" id="method-label-modal">Method</label>
@@ -202,7 +202,7 @@
                 <label for="itemNotesModal" id="notes-label-modal">Notes</label>
                 <input type="text" id="itemNotesModal">
             </div>
-            <button id="saveItemBtn" style="margin-top: 15px;"><span id="save-item-btn-text">Save Item</span></button>
+            <button id="saveItemBtn" class="mt-15"><span id="save-item-btn-text">Save Item</span></button>
         </div>
     </div>
 
@@ -213,3 +213,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+

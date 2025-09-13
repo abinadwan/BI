@@ -404,3 +404,6 @@ html[dir="rtl"] .close-btn {
     display: block;
 }
 
+/* Utility classes */
+.d-none { display: none !important; }
+.mt-15 { margin-top: 15px !important; }
