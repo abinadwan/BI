@@ -8,6 +8,7 @@ const App = {
            projectNameLabel: "Project Name",
            vatRateLabel: "VAT Rate %",
            currencyLabel: "Currency",
+           exportedOnLabel: "Generated on",
            refreshRateBtn: "Refresh Rate",
            itemManagementTitle: "Item Management",
            addItemBtn: "Add Item",
@@ -64,6 +65,7 @@ const App = {
            projectNameLabel: "اسم المشروع",
            vatRateLabel: "نسبة ضريبة القيمة المضافة %",
            currencyLabel: "العملة",
+           exportedOnLabel: "تاريخ ووقت التصدير",
            refreshRateBtn: "تحديث السعر",
            itemManagementTitle: "إدارة البنود",
            addItemBtn: "إضافة بند",
@@ -684,8 +686,30 @@ const App = {
        const filename = `Cost_Estimate_${this.state.projectName || 'Project'}_${date}.xlsx`;
        XLSX.writeFile(wb, filename);
    },
-    exportPDF() {
+    async exportPDF() {
        const doc = new jsPDF({ orientation: 'landscape' });
+
+       if (this.state.currentLang === 'ar') {
+           const fontUrl = 'https://cdn.jsdelivr.net/npm/@fontsource/cairo/files/cairo-arabic-400-normal.ttf';
+           try {
+               const fontBuffer = await fetch(fontUrl).then(res => res.arrayBuffer());
+               const toBase64 = (buffer) => {
+                   let binary = '';
+                   const bytes = new Uint8Array(buffer);
+                   const chunk = 0x8000;
+                   for (let i = 0; i < bytes.length; i += chunk) {
+                       binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+                   }
+                   return btoa(binary);
+               };
+               const fontBase64 = toBase64(fontBuffer);
+               doc.addFileToVFS('Cairo.ttf', fontBase64);
+               doc.addFont('Cairo.ttf', 'Cairo', 'normal');
+               doc.setFont('Cairo');
+           } catch (e) {
+               console.error('Failed to load Arabic font', e);
+           }
+       }
 
        const logoImg = document.querySelector('.logo-container img');
        if (logoImg) {
@@ -712,25 +736,38 @@ const App = {
        ]);
 
        const totals = [
-           this.i18n[this.state.currentLang].totalLabel,
-           '', '', this.elements.totalQtyTd.textContent, '', this.elements.totalCostTd.textContent,
-           '', this.elements.totalDiscountTd.textContent, this.elements.totalExtraTd.textContent,
-           '', this.elements.totalVatTd.textContent, this.elements.totalProfitTd.textContent, this.elements.totalPriceTd.textContent, ''
+           { content: this.i18n[this.state.currentLang].totalLabel, colSpan: 3, styles: { halign: this.state.currentLang === 'ar' ? 'right' : 'left' } },
+           this.elements.totalQtyTd.textContent,
+           '',
+           this.elements.totalCostTd.textContent,
+           '',
+           this.elements.totalDiscountTd.textContent,
+           this.elements.totalExtraTd.textContent,
+           '',
+           this.elements.totalVatTd.textContent,
+           this.elements.totalProfitTd.textContent,
+           this.elements.totalPriceTd.textContent,
+           ''
        ];
-       data.push(totals);
-        const date = new Date().toISOString().split('T')[0];
+
+       const now = new Date();
+       const dateStr = now.toISOString().split('T')[0];
+       const timeStr = now.toTimeString().split(' ')[0];
        const pdfTitle = `${this.i18n[this.state.currentLang].headerTitle} - ${this.state.projectName || 'Project'}`;
-       const filename = `Cost_Estimate_${this.state.projectName || 'Project'}_${date}.pdf`;
-        doc.text(pdfTitle, 45, 20);
+       const filename = `Cost_Estimate_${this.state.projectName || 'Project'}_${dateStr}_${timeStr.replace(/:/g, '-')}.pdf`;
+       doc.text(pdfTitle, 45, 20);
        doc.setFontSize(10);
        doc.text(`${this.i18n[this.state.currentLang].projectNameLabel}: ${this.state.projectName}`, 45, 28);
        doc.text(`${this.i18n[this.state.currentLang].currencyLabel}: ${this.state.currency}, Rate: ${this.state.currencyRate.toFixed(4)}`, 45, 34);
        doc.text(`${this.i18n[this.state.currentLang].vatRateLabel}: ${this.elements.vatRateInput.value}%`, 45, 40);
-        doc.autoTable({
-           startY: 50,
+       doc.text(`${this.i18n[this.state.currentLang].exportedOnLabel}: ${now.toLocaleString(this.state.currentLang === 'ar' ? 'ar-EG' : 'en-US')}`, 45, 46);
+
+       doc.autoTable({
+           startY: 56,
            head: [headers],
            body: data,
-           styles: { font: "helvetica", fontSize: 8 },
+           foot: [totals],
+           styles: { font: this.state.currentLang === 'ar' ? 'Cairo' : 'helvetica', fontSize: 8 },
            headStyles: { fillColor: [41, 128, 185], textColor: 255 },
            didDrawPage: (data) => {
                if (this.state.currentLang === 'ar') {
@@ -739,7 +776,8 @@ const App = {
                }
            }
        });
-        doc.save(filename);
+
+       doc.save(filename);
    },
     // Charts
    drawCharts() {
