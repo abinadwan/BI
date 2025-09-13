@@ -181,9 +181,56 @@ const App = {
        document.getElementById('modal-title').textContent = this.i18n[this.state.currentLang][titleKey];
        document.getElementById('save-item-btn-text').textContent = this.i18n[this.state.currentLang][btnKey];
    },
+
+    // Setup tabs as stages and move header out of panels
+    setupStages() {
+        try {
+            const container = document.querySelector('.container');
+            if (!container) return;
+            const nav = container.querySelector('.ax-tabs-nav');
+            if (!nav) return;
+
+            // Move header out of the header-only panel (if present)
+            const headerEl = container.querySelector('.ax-tabs-panel > header');
+            if (headerEl) {
+                container.insertBefore(headerEl, nav);
+                const headerPanel = headerEl.parentElement;
+                if (headerPanel && headerPanel.classList.contains('ax-tabs-panel')) {
+                    headerPanel.remove();
+                }
+            }
+
+            // Rebuild nav with 4 stages (Arabic labels)
+            nav.setAttribute('aria-label', 'مراحل التطبيق');
+            nav.innerHTML = [
+                '<button class="ax-tab" data-target="stage1" aria-selected="true">المرحلة ١: تفاصيل المشروع</button>',
+                '<button class="ax-tab" data-target="stage2">المرحلة ٢: البنود</button>',
+                '<button class="ax-tab" data-target="stage3">المرحلة ٣: التقارير</button>',
+                '<button class="ax-tab" data-target="stage4">المرحلة ٤: لوحة المؤشرات</button>'
+            ].join('');
+
+            // Map existing panels to stages
+            const mapPanel = (titleId, stage, makeActive = false) => {
+                const titleEl = document.getElementById(titleId);
+                if (!titleEl) return;
+                const panel = titleEl.closest('.ax-tabs-panel');
+                if (!panel) return;
+                panel.setAttribute('data-tab', stage);
+                panel.classList.toggle('ax-active', makeActive);
+            };
+            mapPanel('project-details-title', 'stage1', true);
+            mapPanel('item-management-title', 'stage2');
+            mapPanel('report-management-title', 'stage3');
+            mapPanel('charts-title', 'stage4');
+        } catch (e) {
+            console.error('Failed to set up stages', e);
+        }
+    },
    
    // Initialization
    init() {
+        // Prepare stages/tabs structure first
+        this.setupStages();
        this.loadState();
        this.bindEvents();
        this.setLanguage();
