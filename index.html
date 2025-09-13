@@ -174,12 +174,54 @@
         <h2><span id="report-management-title">Report Management</span></h2>
         <div class="button-group">
           <button id="exportExcelBtn" class="action-button" type="button"><i class="fas fa-file-excel"></i> <span id="export-excel-btn">Export Excel</span></button>
+          <button id="previewPdfBtn" class="action-button" type="button"><i class="fas fa-eye"></i> <span id="preview-pdf-btn">Preview PDF</span></button>
           <button id="exportPDFBtn" class="action-button" type="button"><i class="fas fa-file-pdf"></i> <span id="export-pdf-btn">Export PDF</span></button>
           <button id="printBtn" class="action-button" type="button"><i class="fas fa-print"></i> <span id="print-btn">Print Report</span></button>
           <button id="downloadTemplateBtn" class="action-button" type="button"><i class="fas fa-download"></i> <span id="download-template-btn">Download Excel Template</span></button>
           <input type="file" id="importExcelInput" accept=".xlsx, .xls" class="d-none" aria-hidden="true" />
           <button id="importExcelBtn" class="action-button" type="button"><i class="fas fa-file-import"></i> <span id="import-excel-btn">Import Excel</span></button>
         </div>
+
+        <div class="pdf-options-grid" id="pdfOptions">
+          <div class="form-group">
+            <label id="pdf-options-title">PDF Options</label>
+            <div class="pdf-options-row">
+              <label><input type="checkbox" id="optShowHeader" checked> <span id="show-header-label">Show Header</span></label>
+              <label><input type="checkbox" id="optShowFooter" checked> <span id="show-footer-label">Show Footer</span></label>
+              <label><input type="checkbox" id="optShowLogo" checked> <span id="show-logo-label">Show Logo</span></label>
+              <label><input type="checkbox" id="optShowTotals" checked> <span id="show-totals-label">Show Totals Row</span></label>
+              <label><input type="checkbox" id="optEmbedCharts" checked> <span id="embed-charts-label">Embed Charts</span></label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="optOrientation" id="orientation-label">Orientation</label>
+            <select id="optOrientation">
+              <option value="landscape" selected id="orientation-landscape">Landscape</option>
+              <option value="portrait" id="orientation-portrait">Portrait</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="optColumns" id="include-columns-label">Columns</label>
+            <select id="optColumns" multiple size="8">
+              <option value="#">#</option>
+              <option value="name">Item</option>
+              <option value="unit">Unit</option>
+              <option value="quantity">Qty</option>
+              <option value="costPerUnit">Cost/Unit</option>
+              <option value="totalCost">Total Cost</option>
+              <option value="pct">%</option>
+              <option value="discount">Discount</option>
+              <option value="extra">Extra Costs</option>
+              <option value="method">Method</option>
+              <option value="vatAmount">VAT Amount</option>
+              <option value="profit">Profit</option>
+              <option value="finalPrice">Final Price</option>
+              <option value="notes">Notes</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="pdf-preview" class="pdf-preview d-none" aria-live="polite"></div>
       </section>
     </div>
 
@@ -275,6 +317,7 @@
 
   <!-- App -->
   <script src="script.js"></script>
+  <script src="pdf.js"></script>
 
   <!-- سكربت صغير لتغيير theme-color حسب الثيم/النظام (لا يغيّر منطق تطبيقك) -->
   <script>

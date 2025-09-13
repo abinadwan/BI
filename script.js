@@ -28,6 +28,17 @@ const App = {
       printBtn: "Print Report",
       downloadTemplateBtn: "Download Excel Template",
       importExcelBtn: "Import Excel",
+      previewPdfBtn: "Preview PDF",
+      pdfOptionsTitle: "PDF Options",
+      showHeaderLabel: "Show Header",
+      showFooterLabel: "Show Footer",
+      showLogoLabel: "Show Logo",
+      showTotalsLabel: "Show Totals Row",
+      embedChartsLabel: "Embed Charts",
+      includeColumnsLabel: "Columns",
+      orientationLabel: "Orientation",
+      portrait: "Portrait",
+      landscape: "Landscape",
       chartsTitle: "Charts",
       savedMessage: "Auto-saved",
       langLabel: "العربية",
@@ -43,6 +54,7 @@ const App = {
         noItemsToCalc: "No items to calculate.",
         importSuccess: "Items imported successfully.",
         importError: "Failed to import Excel file. Please check the file format.",
+        pdfExportFailed: "Failed to export PDF. Please try again.",
         template: "Cost Estimator Template"
       },
       chartLabels: {
@@ -118,6 +130,7 @@ const App = {
   elements: {
     appTitle: document.getElementById('app-title'),
     projectNameInput: document.getElementById('projectName'),
+    projectDescInput: document.getElementById('projectDesc'),
     vatRateInput: document.getElementById('vatRate'),
     currencySelect: document.getElementById('currencySelect'),
     rateInfoSpan: document.getElementById('rateInfo'),
@@ -182,12 +195,21 @@ const App = {
     this.elements.saveItemBtn.addEventListener('click', () => this.saveItem());
     this.elements.closeModalBtn.addEventListener('click', () => this.hideModal());
     this.elements.projectNameInput.addEventListener('input', () => this.saveState());
+    if (this.elements.projectDescInput) this.elements.projectDescInput.addEventListener('input', () => this.saveState());
     this.elements.vatRateInput.addEventListener('input', () => this.calculateAll());
     this.elements.currencySelect.addEventListener('change', () => this.updateCurrencyRates());
     document.getElementById('refreshRateBtn').addEventListener('click', () => this.updateCurrencyRates());
     document.getElementById('clearAllBtn').addEventListener('click', () => this.clearAll());
     document.getElementById('exportExcelBtn').addEventListener('click', () => this.exportExcel());
-    document.getElementById('exportPDFBtn').addEventListener('click', () => this.exportPDF());
+    const exportPdfBtn = document.getElementById('exportPDFBtn');
+    if (exportPdfBtn) exportPdfBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (window.PDFExporter) {
+        window.PDFExporter.exportPDF(window.PDFExporter.collectOptions());
+      } else {
+        this.exportPDF();
+      }
+    });
     document.getElementById('printBtn').addEventListener('click', () => window.print());
     document.getElementById('downloadTemplateBtn').addEventListener('click', () => this.downloadTemplate());
     document.getElementById('importExcelBtn').addEventListener('click', () => this.elements.importExcelInput.click());
@@ -256,15 +278,20 @@ const App = {
       'item-management-title': 'itemManagementTitle', 'add-item-btn': 'addItemBtn',
       'clear-all-btn': 'clearAllBtn', 'total-label': 'totalLabel',
       'report-management-title': 'reportManagementTitle', 'export-excel-btn': 'exportExcelBtn',
-      'export-pdf-btn': 'exportPDFBtn', 'print-btn': 'printBtn',
+      'preview-pdf-btn': 'previewPdfBtn', 'export-pdf-btn': 'exportPDFBtn', 'print-btn': 'printBtn',
       'download-template-btn': 'downloadTemplateBtn', 'import-excel-btn': 'importExcelBtn',
-      'charts-title': 'chartsTitle', 'lang-label': 'langLabel',
-      'theme-label': 'themeLabel'
+      'pdf-options-title': 'pdfOptionsTitle', 'show-header-label': 'showHeaderLabel', 'show-footer-label': 'showFooterLabel',
+      'show-logo-label': 'showLogoLabel', 'show-totals-label': 'showTotalsLabel', 'embed-charts-label': 'embedChartsLabel',
+      'orientation-label': 'orientationLabel', 'orientation-landscape': 'landscape', 'orientation-portrait': 'portrait',
+      'include-columns-label': 'includeColumnsLabel',
+      'charts-title': 'chartsTitle', 'lang-label': 'langLabel', 'theme-label': 'themeLabel'
     };
 
     for (const [id, key] of Object.entries(translatableElements)) {
       const el = document.getElementById(id);
-      if (el) el.textContent = this.i18n[this.state.currentLang][key];
+      if (!el) continue;
+      const val = (this.i18n[this.state.currentLang] && this.i18n[this.state.currentLang][key]) ?? (this.i18n['en'] && this.i18n['en'][key]);
+      if (val != null) el.textContent = val;
     }
 
     const headers = document.getElementById('table-headers').children;
