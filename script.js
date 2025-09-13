@@ -351,32 +351,33 @@ const App = {
             let adjustedCost = baseCost + extraCostsApplied - discountApplied;
             adjustedCost = Math.max(0, adjustedCost);
 
-            let profit, basePrice, price, vatAmount = 0;
+            let profit = 0, subtotal = 0, finalPrice = 0, vatAmount = 0;
+
             if (item.method === 'costplus') {
                 profit = adjustedCost * (pct / 100);
-                basePrice = adjustedCost + profit;
+                subtotal = adjustedCost + profit;
             } else if (item.method === 'margin') {
                 if (pct >= 100) {
-                    basePrice = 0;
+                    subtotal = 0;
                     profit = 0;
                 } else {
-                    basePrice = adjustedCost / (1 - pct / 100);
-                    profit = basePrice - adjustedCost;
+                    subtotal = adjustedCost / (1 - pct / 100);
+                    profit = subtotal - adjustedCost;
                 }
             }
 
             if (item.vatChecked) {
-                vatAmount = basePrice * vatRate;
-                price = basePrice + vatAmount;
+                vatAmount = subtotal * vatRate;
+                finalPrice = subtotal + vatAmount;
             } else {
-                price = basePrice;
+                finalPrice = subtotal;
             }
 
             item.totalCost = baseCost;
             item.adjustedCost = adjustedCost;
             item.profit = profit;
             item.vatAmount = vatAmount;
-            item.finalPrice = price;
+            item.finalPrice = finalPrice;
 
             totalQty += qty;
             totalCost += baseCost;
