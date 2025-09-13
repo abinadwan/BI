@@ -2,47 +2,43 @@
 <html lang="en" dir="ltr">
 <head>
   <!-- أساسيات -->
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title id="app-title">Material Cost Estimator</title>
 
   <!-- توافق وتحسينات -->
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="Material Cost Estimator">
-  <meta name="color-scheme" content="light dark">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="description" content="Material Cost Estimator" />
+  <meta name="color-scheme" content="light dark" />
 
-  <!-- ألوان الثيم (تحسين تدريجي: المتصفحات غير الداعمة تتجاهلها) -->
-  <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
 
   <!-- أيقونات الموقع -->
-  <!-- Apple Touch Icons (iOS/iPadOS) -->
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png" sizes="180x180">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon-167.png" sizes="167x167">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon-152.png" sizes="152x152">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon-120.png" sizes="120x120">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon-76.png"  sizes="76x76">
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-180.png" sizes="180x180" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-167.png" sizes="167x167" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-152.png" sizes="152x152" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-120.png" sizes="120x120" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon-76.png"  sizes="76x76" />
 
-  <!-- Favicons (سطح المكتب والمتصفحات) -->
-  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
-  <!-- اختياري: favicon.ico كلفallback قديم -->
-  <link rel="shortcut icon" href="icons/favicon.ico">
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png" />
+  <link rel="shortcut icon" href="icons/favicon.ico" />
 
-  <!-- Safari Pinned Tab (اختياري) -->
-  <link rel="mask-icon" href="icons/safari-pinned-tab.svg" color="#007bff">
-  <meta name="msapplication-TileColor" content="#007bff">
+  <!-- Safari pinned tab (اختياري) -->
+  <link rel="mask-icon" href="icons/safari-pinned-tab.svg" color="#007bff" />
+  <meta name="msapplication-TileColor" content="#007bff" />
 
   <!-- PWA manifest -->
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="manifest.webmanifest" />
 
   <!-- iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <!-- مكتبات وأسلوب -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
@@ -52,20 +48,20 @@
         <div class="button-group">
           <label for="themeToggle" id="theme-label">Dark Mode</label>
           <label class="toggle-switch">
-            <input type="checkbox" id="themeToggle" aria-label="Dark Mode">
+            <input type="checkbox" id="themeToggle" aria-label="Dark Mode" />
             <span class="slider"></span>
           </label>
 
           <label for="langToggle" id="lang-label">English</label>
           <label class="toggle-switch">
-            <input type="checkbox" id="langToggle" aria-label="Language">
+            <input type="checkbox" id="langToggle" aria-label="Language" />
             <span class="slider"></span>
           </label>
         </div>
       </div>
 
       <div class="logo-container">
-        <img src="logo2.png" alt="Logo">
+        <img src="logo2.png" alt="Logo" />
         <h1 class="service-name">Material Cost Estimator</h1>
       </div>
     </header>
@@ -85,11 +81,11 @@
         <div class="controls-grid">
           <div class="form-group">
             <label for="projectName" id="project-name-label">Project Name</label>
-            <input type="text" id="projectName" placeholder="Enter project name">
+            <input type="text" id="projectName" placeholder="Enter project name" />
           </div>
           <div class="form-group">
             <label for="vatRate" id="vat-rate-label">VAT Rate %</label>
-            <input type="number" id="vatRate" value="15" min="0" step="0.01" placeholder="15">
+            <input type="number" id="vatRate" value="15" min="0" step="0.01" placeholder="15" />
           </div>
           <div class="form-group">
             <label for="currencySelect" id="currency-label">Currency</label>
@@ -173,7 +169,7 @@
           <button id="exportPDFBtn" class="action-button" type="button"><i class="fas fa-file-pdf"></i> <span id="export-pdf-btn">Export PDF</span></button>
           <button id="printBtn" class="action-button" type="button"><i class="fas fa-print"></i> <span id="print-btn">Print Report</span></button>
           <button id="downloadTemplateBtn" class="action-button" type="button"><i class="fas fa-download"></i> <span id="download-template-btn">Download Excel Template</span></button>
-          <input type="file" id="importExcelInput" accept=".xlsx, .xls" class="d-none" aria-hidden="true">
+          <input type="file" id="importExcelInput" accept=".xlsx, .xls" class="d-none" aria-hidden="true" />
           <button id="importExcelBtn" class="action-button" type="button"><i class="fas fa-file-import"></i> <span id="import-excel-btn">Import Excel</span></button>
         </div>
       </section>
@@ -207,7 +203,7 @@
 
       <div class="form-group">
         <label for="itemNameModal" id="item-name-label-modal">Item Name</label>
-        <input type="text" id="itemNameModal" required>
+        <input type="text" id="itemNameModal" required />
         <div class="inline-error" id="nameErrorModal"></div>
       </div>
 
@@ -218,29 +214,29 @@
 
       <div class="form-group">
         <label for="itemQuantityModal" id="qty-label-modal">Quantity</label>
-        <input type="text" id="itemQuantityModal" class="numeric-input" inputmode="decimal">
+        <input type="text" id="itemQuantityModal" class="numeric-input" inputmode="decimal" />
       </div>
 
       <div class="form-group">
         <label for="itemCostModal" id="cost-label-modal">Cost Per Unit</label>
-        <input type="text" id="itemCostModal" class="numeric-input" inputmode="decimal">
+        <input type="text" id="itemCostModal" class="numeric-input" inputmode="decimal" />
       </div>
 
       <div class="form-group">
         <label for="itemPctModal" id="pct-label-modal">Percentage %</label>
-        <input type="text" id="itemPctModal" class="numeric-input" inputmode="decimal">
+        <input type="text" id="itemPctModal" class="numeric-input" inputmode="decimal" />
         <div class="inline-error" id="pctErrorModal"></div>
       </div>
 
       <div class="form-group">
         <label for="itemDiscountModal" id="discount-label-modal">Discount</label>
-        <input type="text" id="itemDiscountModal" class="numeric-input" inputmode="decimal">
+        <input type="text" id="itemDiscountModal" class="numeric-input" inputmode="decimal" />
         <select id="itemDiscountTypeModal" aria-label="Discount Type"></select>
       </div>
 
       <div class="form-group">
         <label for="itemExtraModal" id="extra-label-modal">Extra Costs</label>
-        <input type="text" id="itemExtraModal" class="numeric-input" inputmode="decimal">
+        <input type="text" id="itemExtraModal" class="numeric-input" inputmode="decimal" />
         <select id="itemExtraTypeModal" aria-label="Extra Type"></select>
       </div>
 
@@ -250,13 +246,13 @@
       </div>
 
       <div class="form-group">
-        <input type="checkbox" id="itemVatModal">
+        <input type="checkbox" id="itemVatModal" />
         <label for="itemVatModal" id="vat-label-modal">Apply VAT</label>
       </div>
 
       <div class="form-group">
         <label for="itemNotesModal" id="notes-label-modal">Notes</label>
-        <input type="text" id="itemNotesModal">
+        <input type="text" id="itemNotesModal" />
       </div>
 
       <button id="saveItemBtn" class="mt-15" type="button"><span id="save-item-btn-text">Save Item</span></button>
@@ -271,5 +267,45 @@
 
   <!-- App -->
   <script src="script.js"></script>
+
+  <!-- سكربت صغير لتغيير theme-color حسب الثيم/النظام (لا يغيّر منطق تطبيقك) -->
+  <script>
+    (function () {
+      function setThemeColor(hex) {
+        let tag = document.querySelector('meta[name="theme-color"]');
+        if (!tag) {
+          tag = document.createElement('meta');
+          tag.name = 'theme-color';
+          document.head.appendChild(tag);
+        }
+        tag.setAttribute('content', hex);
+      }
+
+      // حسب تفضيل النظام
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      function applySystemThemeColor() {
+        const isDarkBySystem = media.matches;
+        // لو عندك كلاس .dark على <html> يحدد الثيم، خذه في الاعتبار
+        const isDarkByClass = document.documentElement.classList.contains('dark');
+        const isDark = isDarkByClass || isDarkBySystem;
+        setThemeColor(isDark ? '#1a1a1a' : '#007bff');
+      }
+      applySystemThemeColor();
+      if (media.addEventListener) media.addEventListener('change', applySystemThemeColor);
+      else media.addListener(applySystemThemeColor);
+
+      // اربط بزر تغيير الثيم الحالي لديك (checkbox)
+      window.addEventListener('DOMContentLoaded', function () {
+        const toggle = document.getElementById('themeToggle');
+        if (!toggle) return;
+        const applyByToggle = () => {
+          const isDark = document.documentElement.classList.contains('dark') || toggle.checked;
+          setThemeColor(isDark ? '#1a1a1a' : '#007bff');
+        };
+        toggle.addEventListener('change', applyByToggle);
+        applyByToggle();
+      });
+    })();
+  </script>
 </body>
 </html>
