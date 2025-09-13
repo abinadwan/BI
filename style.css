@@ -171,19 +171,31 @@ html[dir="rtl"] .saved-message { text-align: left; }
 html[dir="rtl"] .close-btn { float: left; }
 
 /* Tabs */
-.ax-tabs-nav { display: flex; gap: 10px; margin-bottom: 20px; }
+.ax-tabs-nav { display: flex; gap: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap; }
 .ax-tab {
   background: none; border: 1px solid var(--border-color);
   padding: 8px 16px; cursor: pointer; border-radius: 4px 4px 0 0;
-  background-color: var(--container-bg);
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  line-height: 1.2; white-space: nowrap;
 }
 .ax-tab[aria-selected="true"] {
   border-bottom: 2px solid var(--button-bg);
   font-weight: bold;
-  background: var(--header-bg);
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border-color: var(--button-bg);
+}
+
+/* Prevent generic button:hover styles from overriding tab look */
+.ax-tab:hover {
+  background-color: var(--header-bg);
 }
 .ax-tabs-panel { display: none; }
 .ax-tabs-panel.ax-active { display: block; }
+
+/* Align the refresh button with inputs */
+.controls-grid > .action-button { height: 38px; align-self: end; padding: 0 16px; }
 
 /* Print */
 @media (min-width: 768px) {
