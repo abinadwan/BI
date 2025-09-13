@@ -845,3 +845,25 @@ const App = {
 };
 document.addEventListener('DOMContentLoaded', () => App.init());
 
+document.addEventListener('DOMContentLoaded', () => {
+    const axTabs = document.querySelectorAll('.ax-tab');
+    const axPanels = document.querySelectorAll('.ax-tabs-panel');
+
+    function axActivate(target) {
+        axTabs.forEach(tab => {
+            const selected = tab.getAttribute('data-target') === target;
+            tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+        });
+        axPanels.forEach(panel => {
+            panel.classList.toggle('ax-active', panel.getAttribute('data-tab') === target);
+        });
+    }
+
+    axTabs.forEach(tab => {
+        tab.addEventListener('click', () => axActivate(tab.getAttribute('data-target')));
+    });
+
+    const initial = document.querySelector('.ax-tab[aria-selected="true"]');
+    if (initial) axActivate(initial.getAttribute('data-target'));
+});
+

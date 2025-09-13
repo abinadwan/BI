@@ -9,127 +9,145 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <div class="top-bar">
+        <nav class="ax-tabs-nav" dir="rtl" aria-label="التنقل بين الأقسام">
+            <button class="ax-tab" data-target="الخدمات" aria-selected="true">الخدمات</button>
+            <button class="ax-tab" data-target="تفاصيل المشروع">تفاصيل المشروع</button>
+            <button class="ax-tab" data-target="إدارة البنود">إدارة البنود</button>
+            <button class="ax-tab" data-target="إدارة التقارير">إدارة التقارير</button>
+            <button class="ax-tab" data-target="الرسوم البيانية">الرسوم البيانية</button>
+        </nav>
+
+        <div class="ax-tabs-panel" data-tab="الخدمات">
+            <header>
+                <div class="top-bar">
+                    <div class="button-group">
+                        <label for="themeToggle" id="theme-label"></label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="themeToggle">
+                            <span class="slider"></span>
+                        </label>
+                        <label for="langToggle" id="lang-label"></label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="langToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="logo-container">
+                    <img src="logo2.png" alt="Logo">
+                    <h1 class="service-name">حاسبة التكلفة التقديرية</h1>
+                </div>
+            </header>
+        </div>
+
+        <div class="ax-tabs-panel" data-tab="تفاصيل المشروع">
+            <section class="controls-container">
+                <h2><span id="project-details-title">Project Details</span></h2>
+                <div class="controls-grid">
+                    <div class="form-group">
+                        <label for="projectName" id="project-name-label">Project Name</label>
+                        <input type="text" id="projectName">
+                    </div>
+                    <div class="form-group">
+                        <label for="vatRate" id="vat-rate-label">VAT Rate %</label>
+                        <input type="number" id="vatRate" value="15" min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="currencySelect" id="currency-label">Currency</label>
+                        <select id="currencySelect">
+                            <option value="SAR">SAR</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="GBP">GBP</option>
+                        </select>
+                        <small id="rateInfo" class="currency-rate-info"></small>
+                    </div>
+                    <button id="refreshRateBtn" class="action-button"><i class="fas fa-sync-alt"></i> <span id="refresh-rate-btn">Refresh Rate</span></button>
+                    <div id="rate-error-message"></div>
+                </div>
+            </section>
+        </div>
+
+        <div class="ax-tabs-panel" data-tab="إدارة البنود">
+            <section class="controls-container">
+                <h2><span id="item-management-title">Item Management</span></h2>
                 <div class="button-group">
-                    <label for="themeToggle" id="theme-label"></label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="themeToggle">
-                        <span class="slider"></span>
-                    </label>
-                    <label for="langToggle" id="lang-label"></label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="langToggle">
-                        <span class="slider"></span>
-                    </label>
+                    <button id="addItemBtn" class="action-button"><i class="fas fa-plus"></i> <span id="add-item-btn">Add Item</span></button>
+                    <button id="clearAllBtn" class="action-button delete-btn"><i class="fas fa-trash-alt"></i> <span id="clear-all-btn">Clear All</span></button>
                 </div>
-            </div>
-            <div class="logo-container">
-                <img src="logo2.png" alt="Logo">
-                <h1 class="service-name">حاسبة التكلفة التقديرية</h1>
-            </div>
-        </header>
+            </section>
 
-        <section class="controls-container">
-            <h2><span id="project-details-title">Project Details</span></h2>
-            <div class="controls-grid">
-                <div class="form-group">
-                    <label for="projectName" id="project-name-label">Project Name</label>
-                    <input type="text" id="projectName">
-                </div>
-                <div class="form-group">
-                    <label for="vatRate" id="vat-rate-label">VAT Rate %</label>
-                    <input type="number" id="vatRate" value="15" min="0" step="0.01">
-                </div>
-                <div class="form-group">
-                    <label for="currencySelect" id="currency-label">Currency</label>
-                    <select id="currencySelect">
-                        <option value="SAR">SAR</option>
-                        <option value="USD">USD</option>
-                        <option value="EUR">EUR</option>
-                        <option value="GBP">GBP</option>
-                    </select>
-                    <small id="rateInfo" class="currency-rate-info"></small>
-                </div>
-                <button id="refreshRateBtn" class="action-button"><i class="fas fa-sync-alt"></i> <span id="refresh-rate-btn">Refresh Rate</span></button>
-                <div id="rate-error-message"></div>
-            </div>
-        </section>
+            <section class="table-container">
+                <table>
+                    <thead>
+                        <tr id="table-headers">
+                            <th>#</th>
+                            <th>Item</th>
+                            <th>Unit</th>
+                            <th>Qty</th>
+                            <th>Cost/Unit</th>
+                            <th>Total Cost</th>
+                            <th>%</th>
+                            <th>Discount</th>
+                            <th>Extra Costs</th>
+                            <th>Method</th>
+                            <th>VAT Amount</th>
+                            <th>Profit</th>
+                            <th>Final Price</th>
+                            <th>Notes</th>
+                            <th class="action-cell">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        </tbody>
+                    <tfoot id="table-footer">
+                        <tr class="total-row">
+                            <td colspan="3"><span id="total-label">Totals</span></td>
+                            <td id="totalQty">0</td>
+                            <td></td>
+                            <td id="totalCost">0</td>
+                            <td></td>
+                            <td id="totalDiscount">0</td>
+                            <td id="totalExtra">0</td>
+                            <td></td>
+                            <td id="totalVat">0</td>
+                            <td id="totalProfit">0</td>
+                            <td id="totalPrice">0</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </section>
+        </div>
 
-        <section class="controls-container">
-            <h2><span id="item-management-title">Item Management</span></h2>
-            <div class="button-group">
-                <button id="addItemBtn" class="action-button"><i class="fas fa-plus"></i> <span id="add-item-btn">Add Item</span></button>
-                <button id="clearAllBtn" class="action-button delete-btn"><i class="fas fa-trash-alt"></i> <span id="clear-all-btn">Clear All</span></button>
-            </div>
-        </section>
-        
-        <section class="table-container">
-            <table>
-                <thead>
-                    <tr id="table-headers">
-                        <th>#</th>
-                        <th>Item</th>
-                        <th>Unit</th>
-                        <th>Qty</th>
-                        <th>Cost/Unit</th>
-                        <th>Total Cost</th>
-                        <th>%</th>
-                        <th>Discount</th>
-                        <th>Extra Costs</th>
-                        <th>Method</th>
-                        <th>VAT Amount</th>
-                        <th>Profit</th>
-                        <th>Final Price</th>
-                        <th>Notes</th>
-                        <th class="action-cell">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="itemsTableBody">
-                    </tbody>
-                <tfoot id="table-footer">
-                    <tr class="total-row">
-                        <td colspan="3"><span id="total-label">Totals</span></td>
-                        <td id="totalQty">0</td>
-                        <td></td>
-                        <td id="totalCost">0</td>
-                        <td></td>
-                        <td id="totalDiscount">0</td>
-                        <td id="totalExtra">0</td>
-                        <td></td>
-                        <td id="totalVat">0</td>
-                        <td id="totalProfit">0</td>
-                        <td id="totalPrice">0</td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-        </section>
-        
-        <section class="controls-container">
-            <h2><span id="report-management-title">Report Management</span></h2>
-            <div class="button-group">
-                <button id="exportExcelBtn" class="action-button"><i class="fas fa-file-excel"></i> <span id="export-excel-btn">Export Excel</span></button>
-                <button id="exportPDFBtn" class="action-button"><i class="fas fa-file-pdf"></i> <span id="export-pdf-btn">Export PDF</span></button>
-                <button id="printBtn" class="action-button"><i class="fas fa-print"></i> <span id="print-btn">Print Report</span></button>
-                <button id="downloadTemplateBtn" class="action-button"><i class="fas fa-download"></i> <span id="download-template-btn">Download Excel Template</span></button>
-                <input type="file" id="importExcelInput" accept=".xlsx, .xls" style="display: none;">
-                <button id="importExcelBtn" class="action-button"><i class="fas fa-file-import"></i> <span id="import-excel-btn">Import Excel</span></button>
-            </div>
-        </section>
-        
-        <section class="charts-container">
-            <h2><span id="charts-title">Charts</span></h2>
-            <div id="chart-container">
-                <div class="chart-box">
-                    <canvas id="costProfitBarChart"></canvas>
+        <div class="ax-tabs-panel" data-tab="إدارة التقارير">
+            <section class="controls-container">
+                <h2><span id="report-management-title">Report Management</span></h2>
+                <div class="button-group">
+                    <button id="exportExcelBtn" class="action-button"><i class="fas fa-file-excel"></i> <span id="export-excel-btn">Export Excel</span></button>
+                    <button id="exportPDFBtn" class="action-button"><i class="fas fa-file-pdf"></i> <span id="export-pdf-btn">Export PDF</span></button>
+                    <button id="printBtn" class="action-button"><i class="fas fa-print"></i> <span id="print-btn">Print Report</span></button>
+                    <button id="downloadTemplateBtn" class="action-button"><i class="fas fa-download"></i> <span id="download-template-btn">Download Excel Template</span></button>
+                    <input type="file" id="importExcelInput" accept=".xlsx, .xls" style="display: none;">
+                    <button id="importExcelBtn" class="action-button"><i class="fas fa-file-import"></i> <span id="import-excel-btn">Import Excel</span></button>
                 </div>
-                <div class="chart-box">
-                    <canvas id="costProfitPieChart"></canvas>
+            </section>
+        </div>
+
+        <div class="ax-tabs-panel" data-tab="الرسوم البيانية">
+            <section class="charts-container">
+                <h2><span id="charts-title">Charts</span></h2>
+                <div id="chart-container">
+                    <div class="chart-box">
+                        <canvas id="costProfitBarChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <canvas id="costProfitPieChart"></canvas>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
 
         <div class="footer">
             <span id="saved-message" class="saved-message"></span>

@@ -375,3 +375,32 @@ html[dir="rtl"] .close-btn {
     float: left;
 }
 
+/* ax-tabs styles */
+.ax-tabs-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.ax-tab {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    background-color: var(--container-bg);
+}
+
+.ax-tab[aria-selected="true"] {
+    border-bottom: 2px solid var(--button-bg);
+    font-weight: bold;
+}
+
+.ax-tabs-panel {
+    display: none;
+}
+
+.ax-tabs-panel.ax-active {
+    display: block;
+}
+
