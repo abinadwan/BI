@@ -686,7 +686,18 @@ const App = {
    },
     exportPDF() {
        const doc = new jsPDF({ orientation: 'landscape' });
-       
+
+       const logoImg = document.querySelector('.logo-container img');
+       if (logoImg) {
+           const canvas = document.createElement('canvas');
+           canvas.width = logoImg.naturalWidth;
+           canvas.height = logoImg.naturalHeight;
+           const ctx = canvas.getContext('2d');
+           ctx.drawImage(logoImg, 0, 0);
+           const logoData = canvas.toDataURL('image/png');
+           doc.addImage(logoData, 'PNG', 10, 5, 30, 20);
+       }
+
        const headers = this.i18n[this.state.currentLang].tableHeaders.filter(h => h !== "Actions");
        const data = this.state.items.map((item, index) => [
            index + 1, item.name, this.i18n[this.state.currentLang].units[item.unit], item.quantity,
@@ -699,7 +710,7 @@ const App = {
            (item.profit * this.state.currencyRate).toFixed(2),
            (item.finalPrice * this.state.currencyRate).toFixed(2), item.notes
        ]);
-       
+
        const totals = [
            this.i18n[this.state.currentLang].totalLabel,
            '', '', this.elements.totalQtyTd.textContent, '', this.elements.totalCostTd.textContent,
@@ -710,11 +721,11 @@ const App = {
         const date = new Date().toISOString().split('T')[0];
        const pdfTitle = `${this.i18n[this.state.currentLang].headerTitle} - ${this.state.projectName || 'Project'}`;
        const filename = `Cost_Estimate_${this.state.projectName || 'Project'}_${date}.pdf`;
-        doc.text(pdfTitle, 14, 20);
+        doc.text(pdfTitle, 45, 20);
        doc.setFontSize(10);
-       doc.text(`${this.i18n[this.state.currentLang].projectNameLabel}: ${this.state.projectName}`, 14, 28);
-       doc.text(`${this.i18n[this.state.currentLang].currencyLabel}: ${this.state.currency}, Rate: ${this.state.currencyRate.toFixed(4)}`, 14, 34);
-       doc.text(`${this.i18n[this.state.currentLang].vatRateLabel}: ${this.elements.vatRateInput.value}%`, 14, 40);
+       doc.text(`${this.i18n[this.state.currentLang].projectNameLabel}: ${this.state.projectName}`, 45, 28);
+       doc.text(`${this.i18n[this.state.currentLang].currencyLabel}: ${this.state.currency}, Rate: ${this.state.currencyRate.toFixed(4)}`, 45, 34);
+       doc.text(`${this.i18n[this.state.currentLang].vatRateLabel}: ${this.elements.vatRateInput.value}%`, 45, 40);
         doc.autoTable({
            startY: 50,
            head: [headers],

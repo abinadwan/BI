@@ -77,8 +77,15 @@
 }
 
 .logo-container img {
-    height: 500px;
-    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 500px;
+}
+
+@media (max-width: 768px) {
+    .logo-container img {
+        max-height: 150px;
+    }
 }
 
 .service-name {
