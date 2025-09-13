@@ -230,11 +230,20 @@ thead th, tfoot td {
     grid-template-columns: 1fr;
     gap: 20px;
 }
- .chart-box {
+.chart-box {
     background-color: var(--chart-bg);
     padding: 10px;
     border-radius: 6px;
     box-shadow: 0 2px 6px var(--shadow-color);
+}
+
+.chart-box canvas {
+    width: 100% !important;
+    height: auto !important;
+}
+
+.vat-amount {
+    margin-left: 5px;
 }
  .modal {
     display: none;

@@ -14,7 +14,7 @@ const App = {
            clearAllBtn: "Clear All",
            modalTitle: "Add New Item",
            saveItemBtn: "Save Item",
-           tableHeaders: ["#", "Item", "Unit", "Qty", "Cost/Unit", "Total Cost", "%", "Discount", "Extra Costs", "Method", "VAT", "Profit", "Final Price", "Notes", "Actions"],
+           tableHeaders: ["#", "Item", "Unit", "Qty", "Cost/Unit", "Total Cost", "%", "Discount", "Extra Costs", "Method", "VAT Amount", "Profit", "Final Price", "Notes", "Actions"],
            totalLabel: "Totals",
            reportManagementTitle: "Report Management",
            exportExcelBtn: "Export Excel",
@@ -67,7 +67,7 @@ const App = {
            clearAllBtn: "مسح الكل",
            modalTitle: "إضافة بند جديد",
            saveItemBtn: "حفظ البند",
-           tableHeaders: ["#", "البند", "الوحدة", "الكمية", "سعر التكلفة/وحدة", "إجمالي التكلفة", "النسبة %", "الخصم", "مصاريف إضافية", "طريقة الحسبة", "ضريبة", "الربح", "السعر النهائي", "ملاحظات", "إجراءات"],
+           tableHeaders: ["#", "البند", "الوحدة", "الكمية", "سعر التكلفة/وحدة", "إجمالي التكلفة", "النسبة %", "الخصم", "مصاريف إضافية", "طريقة الحسبة", "مبلغ الضريبة", "الربح", "السعر النهائي", "ملاحظات", "إجراءات"],
            totalLabel: "الإجماليات",
            reportManagementTitle: "إدارة التقارير",
            exportExcelBtn: "تصدير إلى إكسل",
@@ -135,6 +135,7 @@ const App = {
        totalPriceTd: document.getElementById('totalPrice'),
        totalDiscountTd: document.getElementById('totalDiscount'),
        totalExtraTd: document.getElementById('totalExtra'),
+       totalVatTd: document.getElementById('totalVat'),
        savedMessage: document.getElementById('saved-message'),
        importExcelInput: document.getElementById('importExcelInput'),
        costProfitBarChartCanvas: document.getElementById('costProfitBarChart'),
@@ -303,9 +304,9 @@ const App = {
    },
     // Core Calculation
    calculateAll() {
-       let totalQty = 0, totalCost = 0, totalProfit = 0, totalPrice = 0, totalDiscount = 0, totalExtra = 0;
+       let totalQty = 0, totalCost = 0, totalProfit = 0, totalPrice = 0, totalDiscount = 0, totalExtra = 0, totalVat = 0;
        const vatRate = parseFloat(this.elements.vatRateInput.value) / 100;
-        this.state.items.forEach(item => {
+       this.state.items.forEach(item => {
            const qty = parseFloat(item.quantity) || 0;
            const costPerUnit = parseFloat(item.costPerUnit) || 0;
            const pct = parseFloat(item.pct) || 0;
@@ -317,36 +318,43 @@ const App = {
            const extraCostsApplied = item.extraType === 'perunit' ? extra * qty : extra;
            const discountApplied = item.discountType === 'percent' ? (baseCost * discount / 100) : discount;
            
-           let adjustedCost = baseCost + extraCostsApplied - discountApplied;
-           adjustedCost = Math.max(0, adjustedCost);
-           
-           let profit, price;
+            let adjustedCost = baseCost + extraCostsApplied - discountApplied;
+            adjustedCost = Math.max(0, adjustedCost);
+
+            let profit, basePrice, price, vatAmount = 0;
             if (item.method === 'costplus') {
-               profit = adjustedCost * (pct / 100);
-               price = adjustedCost + profit;
-           } else if (item.method === 'margin') {
-               if (pct >= 100) {
-                   price = 0;
-                   profit = 0;
-               } else {
-                   price = adjustedCost / (1 - pct / 100);
-                   profit = price - adjustedCost;
-               }
-           }
-           
-           if (item.vatChecked) {
-               price *= (1 + vatRate);
-           }
+                profit = adjustedCost * (pct / 100);
+                basePrice = adjustedCost + profit;
+            } else if (item.method === 'margin') {
+                if (pct >= 100) {
+                    basePrice = 0;
+                    profit = 0;
+                } else {
+                    basePrice = adjustedCost / (1 - pct / 100);
+                    profit = basePrice - adjustedCost;
+                }
+            }
+
+            if (item.vatChecked) {
+                vatAmount = basePrice * vatRate;
+                price = basePrice + vatAmount;
+            } else {
+                price = basePrice;
+            }
+
             item.totalCost = baseCost;
-           item.adjustedCost = adjustedCost;
-           item.profit = profit;
-           item.finalPrice = price;
+            item.adjustedCost = adjustedCost;
+            item.profit = profit;
+            item.vatAmount = vatAmount;
+            item.finalPrice = price;
+
             totalQty += qty;
-           totalCost += baseCost;
-           totalProfit += profit;
-           totalPrice += price;
-           totalDiscount += discountApplied;
-           totalExtra += extraCostsApplied;
+            totalCost += baseCost;
+            totalProfit += profit;
+            totalPrice += price;
+            totalDiscount += discountApplied;
+            totalExtra += extraCostsApplied;
+            totalVat += vatAmount;
        });
         this.elements.totalQtyTd.textContent = totalQty.toFixed(0);
        this.elements.totalCostTd.textContent = (totalCost * this.state.currencyRate).toFixed(2);
@@ -354,7 +362,8 @@ const App = {
        this.elements.totalPriceTd.textContent = (totalPrice * this.state.currencyRate).toFixed(2);
        this.elements.totalDiscountTd.textContent = (totalDiscount * this.state.currencyRate).toFixed(2);
        this.elements.totalExtraTd.textContent = (totalExtra * this.state.currencyRate).toFixed(2);
-       
+       this.elements.totalVatTd.textContent = (totalVat * this.state.currencyRate).toFixed(2);
+
        this.renderTable();
        this.drawCharts();
        this.saveState();
@@ -436,7 +445,10 @@ const App = {
                    <select class="edit-select" data-field="extraType" onchange="App.handleInlineEdit(event, ${index})">${this.renderExtraTypeOptions(item.extraType)}</select>
                </td>
                <td><select class="edit-select" data-field="method" onchange="App.handleInlineEdit(event, ${index})">${this.renderMethodOptions(item.method)}</select></td>
-               <td><input type="checkbox" class="edit-checkbox" data-field="vatChecked" ${item.vatChecked ? 'checked' : ''} onchange="App.handleInlineEdit(event, ${index})"></td>
+               <td>
+                   <input type="checkbox" class="edit-checkbox" data-field="vatChecked" ${item.vatChecked ? 'checked' : ''} onchange="App.handleInlineEdit(event, ${index})">
+                   <span class="vat-amount">${(item.vatAmount * this.state.currencyRate).toFixed(2) || '0.00'}</span>
+               </td>
                <td>${(item.profit * this.state.currencyRate).toFixed(2) || '0.00'}</td>
                <td>${(item.finalPrice * this.state.currencyRate).toFixed(2) || '0.00'}</td>
                <td class="notes-cell"><input type="text" class="edit-input" data-field="notes" value="${item.notes}" oninput="App.handleInlineEdit(event, ${index})"></td>
@@ -586,7 +598,8 @@ const App = {
            'Discount Type': this.i18n[this.state.currentLang].discountTypes[item.discountType],
            'Extra Costs': item.extra, 'Extra Type': this.i18n[this.state.currentLang].extraTypes[item.extraType],
            'Method': this.i18n[this.state.currentLang].methods[item.method],
-           'VAT Applied': item.vatChecked, 'Profit (SAR)': item.profit.toFixed(2),
+           'VAT Amount (SAR)': item.vatAmount.toFixed(2), 'VAT Amount': (item.vatAmount * this.state.currencyRate).toFixed(2),
+           'Profit (SAR)': item.profit.toFixed(2),
            'Profit': (item.profit * this.state.currencyRate).toFixed(2),
            'Final Price (SAR)': item.finalPrice.toFixed(2),
            'Final Price': (item.finalPrice * this.state.currencyRate).toFixed(2),
@@ -618,7 +631,8 @@ const App = {
            (item.totalCost * this.state.currencyRate).toFixed(2), item.pct,
            (item.discount * this.state.currencyRate).toFixed(2),
            (item.extra * this.state.currencyRate).toFixed(2),
-           this.i18n[this.state.currentLang].methods[item.method], item.vatChecked ? "Yes" : "No",
+           this.i18n[this.state.currentLang].methods[item.method],
+           (item.vatAmount * this.state.currencyRate).toFixed(2),
            (item.profit * this.state.currencyRate).toFixed(2),
            (item.finalPrice * this.state.currencyRate).toFixed(2), item.notes
        ]);
@@ -627,7 +641,7 @@ const App = {
            this.i18n[this.state.currentLang].totalLabel,
            '', '', this.elements.totalQtyTd.textContent, '', this.elements.totalCostTd.textContent,
            '', this.elements.totalDiscountTd.textContent, this.elements.totalExtraTd.textContent,
-           '', '', this.elements.totalProfitTd.textContent, this.elements.totalPriceTd.textContent, ''
+           '', this.elements.totalVatTd.textContent, this.elements.totalProfitTd.textContent, this.elements.totalPriceTd.textContent, ''
        ];
        data.push(totals);
         const date = new Date().toISOString().split('T')[0];
