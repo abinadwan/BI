@@ -1,15 +1,28 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
+  <!-- أساسيات -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title id="app-title">Material Cost Estimator</title>
 
-  <meta name="color-scheme" content="light dark">
+  <!-- توافق وتحسينات -->
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="description" content="Material Cost Estimator">
-  <meta name="theme-color" content="#007bff">
+  <meta name="color-scheme" content="light dark">
 
+  <!-- ألوان الثيم (تحسين تدريجي: المتصفحات غير الداعمة تتجاهلها) -->
+  <meta name="theme-color" content="#007bff" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- مكتبات وأسلوب -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -71,7 +84,7 @@
             <small id="rateInfo" class="currency-rate-info"></small>
           </div>
 
-          <button id="refreshRateBtn" class="action-button">
+          <button id="refreshRateBtn" class="action-button" type="button">
             <i class="fas fa-sync-alt"></i>
             <span id="refresh-rate-btn">Refresh Rate</span>
           </button>
@@ -85,8 +98,8 @@
       <section class="controls-container">
         <h2><span id="item-management-title">Item Management</span></h2>
         <div class="button-group">
-          <button id="addItemBtn" class="action-button"><i class="fas fa-plus"></i> <span id="add-item-btn">Add Item</span></button>
-          <button id="clearAllBtn" class="action-button delete-btn"><i class="fas fa-trash-alt"></i> <span id="clear-all-btn">Clear All</span></button>
+          <button id="addItemBtn" class="action-button" type="button"><i class="fas fa-plus"></i> <span id="add-item-btn">Add Item</span></button>
+          <button id="clearAllBtn" class="action-button delete-btn" type="button"><i class="fas fa-trash-alt"></i> <span id="clear-all-btn">Clear All</span></button>
         </div>
       </section>
 
@@ -138,12 +151,12 @@
       <section class="controls-container">
         <h2><span id="report-management-title">Report Management</span></h2>
         <div class="button-group">
-          <button id="exportExcelBtn" class="action-button"><i class="fas fa-file-excel"></i> <span id="export-excel-btn">Export Excel</span></button>
-          <button id="exportPDFBtn" class="action-button"><i class="fas fa-file-pdf"></i> <span id="export-pdf-btn">Export PDF</span></button>
-          <button id="printBtn" class="action-button"><i class="fas fa-print"></i> <span id="print-btn">Print Report</span></button>
-          <button id="downloadTemplateBtn" class="action-button"><i class="fas fa-download"></i> <span id="download-template-btn">Download Excel Template</span></button>
+          <button id="exportExcelBtn" class="action-button" type="button"><i class="fas fa-file-excel"></i> <span id="export-excel-btn">Export Excel</span></button>
+          <button id="exportPDFBtn" class="action-button" type="button"><i class="fas fa-file-pdf"></i> <span id="export-pdf-btn">Export PDF</span></button>
+          <button id="printBtn" class="action-button" type="button"><i class="fas fa-print"></i> <span id="print-btn">Print Report</span></button>
+          <button id="downloadTemplateBtn" class="action-button" type="button"><i class="fas fa-download"></i> <span id="download-template-btn">Download Excel Template</span></button>
           <input type="file" id="importExcelInput" accept=".xlsx, .xls" class="d-none" aria-hidden="true">
-          <button id="importExcelBtn" class="action-button"><i class="fas fa-file-import"></i> <span id="import-excel-btn">Import Excel</span></button>
+          <button id="importExcelBtn" class="action-button" type="button"><i class="fas fa-file-import"></i> <span id="import-excel-btn">Import Excel</span></button>
         </div>
       </section>
     </div>
@@ -228,7 +241,7 @@
         <input type="text" id="itemNotesModal">
       </div>
 
-      <button id="saveItemBtn" class="mt-15"><span id="save-item-btn-text">Save Item</span></button>
+      <button id="saveItemBtn" class="mt-15" type="button"><span id="save-item-btn-text">Save Item</span></button>
     </div>
   </div>
 
