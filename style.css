@@ -210,6 +210,12 @@ html[dir="rtl"] .close-btn { float: left; }
 .pdf-preview table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .pdf-preview th, .pdf-preview td { border: 1px solid var(--border-color); padding: 6px; }
 
+/* KPI cards (Figma-inspired) */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 12px 0; }
+.kpi-card { background: var(--container-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; box-shadow: 0 1px 3px var(--shadow-color); }
+.kpi-card .kpi-label { color: var(--chart-text); font-size: 0.9rem; margin-bottom: 6px; display: block; }
+.kpi-card .kpi-value { font-weight: 700; font-size: 1.25rem; }
+
 /* Print */
 @media (min-width: 768px) {
   #chart-container { grid-template-columns: 1fr 1fr; }
