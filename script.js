@@ -128,8 +128,7 @@ const App = {
     // UI Elements
    elements: {
        appTitle: document.getElementById('app-title'),
-       headerTitle: document.getElementById('header-title'),
-       projectNameInput: document.getElementById('projectName'),
+        projectNameInput: document.getElementById('projectName'),
        vatRateInput: document.getElementById('vatRate'),
        currencySelect: document.getElementById('currencySelect'),
        rateInfoSpan: document.getElementById('rateInfo'),
@@ -268,8 +267,8 @@ const App = {
        document.documentElement.setAttribute('dir', this.state.currentLang === 'ar' ? 'rtl' : 'ltr');
        
        const translatableElements = {
-           'app-title': 'title', 'header-title': 'headerTitle', 'project-details-title': 'projectDetailsTitle',
-           'project-name-label': 'projectNameLabel', 'vat-rate-label': 'vatRateLabel',
+            'app-title': 'title', 'project-details-title': 'projectDetailsTitle',
+            'project-name-label': 'projectNameLabel', 'vat-rate-label': 'vatRateLabel',
            'currency-label': 'currencyLabel', 'refresh-rate-btn': 'refreshRateBtn',
            'item-management-title': 'itemManagementTitle', 'add-item-btn': 'addItemBtn',
            'clear-all-btn': 'clearAllBtn', 'total-label': 'totalLabel',
@@ -351,7 +350,7 @@ const App = {
             let adjustedCost = baseCost + extraCostsApplied - discountApplied;
             adjustedCost = Math.max(0, adjustedCost);
 
-            let profit = 0, subtotal = 0, finalPrice = 0, vatAmount = 0;
+             let profit = 0, subtotal = 0, price = 0, vatAmount = 0;
 
             if (item.method === 'costplus') {
                 profit = adjustedCost * (pct / 100);
@@ -367,22 +366,22 @@ const App = {
             }
 
             if (item.vatChecked) {
-                vatAmount = subtotal * vatRate;
-                finalPrice = subtotal + vatAmount;
-            } else {
-                finalPrice = subtotal;
-            }
+                 vatAmount = subtotal * vatRate;
+                 price = subtotal + vatAmount;
+             } else {
+                 price = subtotal;
+             }
 
             item.totalCost = baseCost;
             item.adjustedCost = adjustedCost;
             item.profit = profit;
             item.vatAmount = vatAmount;
-            item.finalPrice = finalPrice;
+             item.finalPrice = price;
 
             totalQty += qty;
             totalCost += baseCost;
             totalProfit += profit;
-            totalPrice += finalPrice;
+             totalPrice += price;
             totalDiscount += discountApplied;
             totalExtra += extraCostsApplied;
             totalVat += vatAmount;
