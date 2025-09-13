@@ -5,31 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="app-title">حاسبة التكلفة التقديرية للمواد | Material Cost Estimator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-// Before
-// No event listener for the table body, events are inline.
-
-// After (in bindEvents function)
-this.elements.itemsTableBody.addEventListener('input', (event) => {
-    if (event.target.classList.contains('edit-input')) {
-        const index = event.target.closest('tr').dataset.index;
-        this.handleInlineEdit(event, index);
-    }
-});
-// ... add listeners for 'change' on selects and 'click' on buttons
-// Before
-// No event listener for the table body, events are inline.
-
-// After (in bindEvents function)
-this.elements.itemsTableBody.addEventListener('input', (event) => {
-    if (event.target.classList.contains('edit-input')) {
-        const index = event.target.closest('tr').dataset.index;
-        this.handleInlineEdit(event, index);
-    }
-});
-// ... add listeners for 'change' on selects and 'click' on buttons
     <style>
-    <link rel="stylesheet" href="style.css">
-    <!-- <style>
         :root {
             --bg-color: #f4f4f9;
             --text-color: #333;
@@ -403,7 +379,6 @@ this.elements.itemsTableBody.addEventListener('input', (event) => {
             float: left;
         }
     </style>
-    </style> -->
 </head>
 <body>
     <div class="container">
@@ -1371,6 +1346,5 @@ this.elements.itemsTableBody.addEventListener('input', (event) => {
 
         document.addEventListener('DOMContentLoaded', () => App.init());
     </script>
-    <script src="main.js"></script>
 </body>
 </html>
