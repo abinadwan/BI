@@ -1,0 +1,4 @@
+importExcelBtn: "Import Excel",
+      previewPdfBtn: "Preview PDF",
+      pdfOptionsTitle: "PDF Options",
+      showHead
