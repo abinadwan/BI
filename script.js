@@ -7,6 +7,7 @@ const App = {
       headerTitle: "Material Cost Estimator",
       projectDetailsTitle: "Project Details",
       projectNameLabel: "Project Name",
+      projectDescLabel: "Project Description",
       vatRateLabel: "VAT Rate %",
       currencyLabel: "Currency",
       exportedOnLabel: "Generated on",
@@ -203,6 +204,7 @@ const App = {
   saveState() {
     this.state.vatRate = parseFloat(this.elements.vatRateInput.value) || 0;
     this.state.projectName = this.elements.projectNameInput.value;
+    this.state.projectDesc = this.elements.projectDescInput ? this.elements.projectDescInput.value : '';
     this.state.currency = this.elements.currencySelect.value;
     localStorage.setItem('profitCalculatorState', JSON.stringify(this.state));
     this.showSavedMessage();
@@ -213,6 +215,7 @@ const App = {
       this.state = state;
       this.elements.vatRateInput.value = this.state.vatRate;
       this.elements.projectNameInput.value = this.state.projectName;
+      if (this.elements.projectDescInput) this.elements.projectDescInput.value = this.state.projectDesc || '';
       this.elements.currencySelect.value = this.state.currency;
       if (this.state.currentTheme === 'dark') {
         this.elements.themeToggle.checked = true;
@@ -248,7 +251,7 @@ const App = {
 
     const translatableElements = {
       'app-title': 'title', 'project-details-title': 'projectDetailsTitle',
-      'project-name-label': 'projectNameLabel', 'vat-rate-label': 'vatRateLabel',
+      'project-name-label': 'projectNameLabel', 'project-desc-label': 'projectDescLabel', 'vat-rate-label': 'vatRateLabel',
       'currency-label': 'currencyLabel', 'refresh-rate-btn': 'refreshRateBtn',
       'item-management-title': 'itemManagementTitle', 'add-item-btn': 'addItemBtn',
       'clear-all-btn': 'clearAllBtn', 'total-label': 'totalLabel',
@@ -705,6 +708,7 @@ const App = {
     const ws = XLSX.utils.json_to_sheet(data);
     const summaryData = [
       [this.i18n[this.state.currentLang].projectNameLabel, this.state.projectName],
+      [this.i18n[this.state.currentLang].projectDescLabel || 'Description', this.state.projectDesc || ''],
       [this.i18n[this.state.currentLang].currencyLabel, this.state.currency],
       [`Exchange Rate (1 SAR)`, this.state.currencyRate.toFixed(4)],
       [this.i18n[this.state.currentLang].vatRateLabel, this.elements.vatRateInput.value + "%"],
@@ -785,10 +789,18 @@ const App = {
 
     doc.text(pdfTitle, 45, 20);
     doc.setFontSize(10);
-    doc.text(`${this.i18n[this.state.currentLang].projectNameLabel}: ${this.state.projectName}`, 45, 28);
-    doc.text(`${this.i18n[this.state.currentLang].currencyLabel}: ${this.state.currency}, Rate: ${this.state.currencyRate.toFixed(4)}`, 45, 34);
-    doc.text(`${this.i18n[this.state.currentLang].vatRateLabel}: ${this.elements.vatRateInput.value}%`, 45, 40);
-    doc.text(`${this.i18n[this.state.currentLang].exportedOnLabel}: ${now.toLocaleString(this.state.currentLang === 'ar' ? 'ar-EG' : 'en-US')}`, 45, 46);
+    let y = 28;
+    doc.text(`${this.i18n[this.state.currentLang].projectNameLabel}: ${this.state.projectName}`, 45, y);
+    if (this.state.projectDesc) {
+      y += 6;
+      doc.text(`${this.i18n[this.state.currentLang].projectDescLabel || 'Description'}: ${this.state.projectDesc}`, 45, y);
+    }
+    y += 6;
+    doc.text(`${this.i18n[this.state.currentLang].currencyLabel}: ${this.state.currency}, Rate: ${this.state.currencyRate.toFixed(4)}`, 45, y);
+    y += 6;
+    doc.text(`${this.i18n[this.state.currentLang].vatRateLabel}: ${this.elements.vatRateInput.value}%`, 45, y);
+    y += 6;
+    doc.text(`${this.i18n[this.state.currentLang].exportedOnLabel}: ${now.toLocaleString(this.state.currentLang === 'ar' ? 'ar-EG' : 'en-US')}`, 45, y);
 
     doc.autoTable({
       startY: 56,
