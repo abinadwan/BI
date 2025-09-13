@@ -15,6 +15,8 @@
     --shadow-color: rgba(0, 0, 0, 0.1);
     --delete-btn: #dc3545;
     --delete-btn-hover: #c82333;
+    --edit-btn: #ffc107;
+    --edit-btn-hover: #e0a800;
     --error-color: #dc3545;
     --modal-bg: rgba(0, 0, 0, 0.5);
     --icon-color: #007bff;
@@ -36,6 +38,8 @@
     --shadow-color: rgba(255, 255, 255, 0.1);
     --delete-btn: #dc3545;
     --delete-btn-hover: #dc3545;
+    --edit-btn: #ffc107;
+    --edit-btn-hover: #e0a800;
     --error-color: #dc3545;
     --modal-bg: rgba(255, 255, 255, 0.2);
     --icon-color: #fff;
@@ -124,11 +128,17 @@ button:hover {
     font-size: 14px;
     min-width: 120px;
 }
- .delete-btn {
+.delete-btn {
     background-color: var(--delete-btn);
 }
- .delete-btn:hover {
+.delete-btn:hover {
     background-color: var(--delete-btn-hover);
+}
+.edit-btn {
+    background-color: var(--edit-btn);
+}
+.edit-btn:hover {
+    background-color: var(--edit-btn-hover);
 }
  .table-container {
     overflow-x: auto;

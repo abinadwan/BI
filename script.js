@@ -14,6 +14,9 @@ const App = {
            clearAllBtn: "Clear All",
            modalTitle: "Add New Item",
            saveItemBtn: "Save Item",
+           editModalTitle: "Edit Item",
+           updateItemBtn: "Update Item",
+           editBtn: "Edit",
            tableHeaders: ["#", "Item", "Unit", "Qty", "Cost/Unit", "Total Cost", "%", "Discount", "Extra Costs", "Method", "VAT Amount", "Profit", "Final Price", "Notes", "Actions"],
            totalLabel: "Totals",
            reportManagementTitle: "Report Management",
@@ -67,6 +70,9 @@ const App = {
            clearAllBtn: "مسح الكل",
            modalTitle: "إضافة بند جديد",
            saveItemBtn: "حفظ البند",
+           editModalTitle: "تعديل البند",
+           updateItemBtn: "تحديث البند",
+           editBtn: "تعديل",
            tableHeaders: ["#", "البند", "الوحدة", "الكمية", "سعر التكلفة/وحدة", "إجمالي التكلفة", "النسبة %", "الخصم", "مصاريف إضافية", "طريقة الحسبة", "مبلغ الضريبة", "الربح", "السعر النهائي", "ملاحظات", "إجراءات"],
            totalLabel: "الإجماليات",
            reportManagementTitle: "إدارة التقارير",
@@ -118,6 +124,7 @@ const App = {
        vatRate: 15,
        projectName: ''
    },
+   editingIndex: null,
     // UI Elements
    elements: {
        appTitle: document.getElementById('app-title'),
@@ -151,6 +158,28 @@ const App = {
        barChart: null,
        pieChart: null
    },
+
+   // Utility functions for numeral conversion and formatting
+   toEnglishDigits(str) {
+       return str.replace(/[٠-٩]/g, d => '0123456789'['٠١٢٣٤٥٦٧٨٩'.indexOf(d)]).replace(/٫/g, '.');
+   },
+   toArabicDigits(str) {
+       return str.replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[d]).replace(/\./g, '٫');
+   },
+   formatInputValue(value) {
+       const str = value !== undefined && value !== null ? String(value) : '';
+       return this.state.currentLang === 'ar' ? this.toArabicDigits(str) : str;
+   },
+   formatNumber(num, decimals = 2) {
+       const str = (Number(num) || 0).toFixed(decimals);
+       return this.state.currentLang === 'ar' ? this.toArabicDigits(str) : str;
+   },
+   updateModalTexts() {
+       const titleKey = this.editingIndex !== null ? 'editModalTitle' : 'modalTitle';
+       const btnKey = this.editingIndex !== null ? 'updateItemBtn' : 'saveItemBtn';
+       document.getElementById('modal-title').textContent = this.i18n[this.state.currentLang][titleKey];
+       document.getElementById('save-item-btn-text').textContent = this.i18n[this.state.currentLang][btnKey];
+   },
    
    // Initialization
    init() {
@@ -163,7 +192,7 @@ const App = {
    },
     // Event Binding
    bindEvents() {
-       this.elements.addItemBtn.addEventListener('click', () => this.showModal());
+       this.elements.addItemBtn.addEventListener('click', () => this.openAddModal());
        this.elements.saveItemBtn.addEventListener('click', () => this.saveItem());
        this.elements.closeModalBtn.addEventListener('click', () => this.hideModal());
        this.elements.projectNameInput.addEventListener('input', () => this.saveState());
@@ -248,7 +277,7 @@ const App = {
            'export-pdf-btn': 'exportPDFBtn', 'print-btn': 'printBtn',
            'download-template-btn': 'downloadTemplateBtn', 'import-excel-btn': 'importExcelBtn',
            'charts-title': 'chartsTitle', 'lang-label': 'langLabel',
-           'theme-label': 'themeLabel', 'modal-title': 'modalTitle', 'save-item-btn-text': 'saveItemBtn'
+           'theme-label': 'themeLabel'
        };
        
        for (const [id, key] of Object.entries(translatableElements)) {
@@ -260,10 +289,11 @@ const App = {
        this.i18n[this.state.currentLang].tableHeaders.forEach((text, index) => {
            if (headers[index]) headers[index].textContent = text;
        });
-        this.renderModalOptions();
+       this.renderModalOptions();
        this.renderTable();
        this.drawCharts();
        this.updateRateInfo();
+       this.updateModalTexts();
        this.saveState();
    },
     setTheme() {
@@ -300,7 +330,7 @@ const App = {
    },
     updateRateInfo() {
        const currency = this.elements.currencySelect.value;
-       this.elements.rateInfoSpan.textContent = `1 SAR = ${this.state.currencyRate.toFixed(4)} ${currency}`;
+       this.elements.rateInfoSpan.textContent = `1 SAR = ${this.formatNumber(this.state.currencyRate, 4)} ${currency}`;
    },
     // Core Calculation
    calculateAll() {
@@ -356,13 +386,13 @@ const App = {
             totalExtra += extraCostsApplied;
             totalVat += vatAmount;
        });
-        this.elements.totalQtyTd.textContent = totalQty.toFixed(0);
-       this.elements.totalCostTd.textContent = (totalCost * this.state.currencyRate).toFixed(2);
-       this.elements.totalProfitTd.textContent = (totalProfit * this.state.currencyRate).toFixed(2);
-       this.elements.totalPriceTd.textContent = (totalPrice * this.state.currencyRate).toFixed(2);
-       this.elements.totalDiscountTd.textContent = (totalDiscount * this.state.currencyRate).toFixed(2);
-       this.elements.totalExtraTd.textContent = (totalExtra * this.state.currencyRate).toFixed(2);
-       this.elements.totalVatTd.textContent = (totalVat * this.state.currencyRate).toFixed(2);
+       this.elements.totalQtyTd.textContent = this.formatNumber(totalQty, 0);
+       this.elements.totalCostTd.textContent = this.formatNumber(totalCost * this.state.currencyRate);
+       this.elements.totalProfitTd.textContent = this.formatNumber(totalProfit * this.state.currencyRate);
+       this.elements.totalPriceTd.textContent = this.formatNumber(totalPrice * this.state.currencyRate);
+       this.elements.totalDiscountTd.textContent = this.formatNumber(totalDiscount * this.state.currencyRate);
+       this.elements.totalExtraTd.textContent = this.formatNumber(totalExtra * this.state.currencyRate);
+       this.elements.totalVatTd.textContent = this.formatNumber(totalVat * this.state.currencyRate);
 
        this.renderTable();
        this.drawCharts();
@@ -371,54 +401,87 @@ const App = {
     // Modal & Item Management
    showModal() {
        this.elements.itemModal.style.display = "flex";
+   },
+   hideModal() {
+       this.elements.itemModal.style.display = "none";
+       this.editingIndex = null;
+   },
+   openAddModal() {
+       this.editingIndex = null;
        this.renderModalOptions();
        this.resetModal();
+       this.updateModalTexts();
+       this.showModal();
    },
-    hideModal() {
-       this.elements.itemModal.style.display = "none";
+   openEditModal(index) {
+       this.editingIndex = index;
+       const item = this.state.items[index];
+       this.renderModalOptions();
+       document.getElementById('itemNameModal').value = item.name;
+       document.getElementById('itemUnitModal').value = item.unit;
+       document.getElementById('itemQuantityModal').value = this.formatInputValue(item.quantity);
+       document.getElementById('itemCostModal').value = this.formatInputValue(item.costPerUnit);
+       document.getElementById('itemPctModal').value = this.formatInputValue(item.pct);
+       document.getElementById('itemDiscountModal').value = this.formatInputValue(item.discount);
+       document.getElementById('itemDiscountTypeModal').value = item.discountType;
+       document.getElementById('itemExtraModal').value = this.formatInputValue(item.extra);
+       document.getElementById('itemExtraTypeModal').value = item.extraType;
+       document.getElementById('itemMethodModal').value = item.method;
+       document.getElementById('itemVatModal').checked = item.vatChecked;
+       document.getElementById('itemNotesModal').value = item.notes;
+       document.getElementById('nameErrorModal').style.display = 'none';
+       document.getElementById('pctErrorModal').style.display = 'none';
+       this.updateModalTexts();
+       this.showModal();
    },
-    resetModal() {
+   resetModal() {
        document.getElementById('itemNameModal').value = '';
-       document.getElementById('itemQuantityModal').value = 0;
-       document.getElementById('itemCostModal').value = 0;
-       document.getElementById('itemPctModal').value = 0;
-       document.getElementById('itemDiscountModal').value = 0;
-       document.getElementById('itemExtraModal').value = 0;
+       document.getElementById('itemQuantityModal').value = '';
+       document.getElementById('itemCostModal').value = '';
+       document.getElementById('itemPctModal').value = '';
+       document.getElementById('itemDiscountModal').value = '';
+       document.getElementById('itemExtraModal').value = '';
        document.getElementById('itemVatModal').checked = false;
        document.getElementById('itemNotesModal').value = '';
        document.getElementById('nameErrorModal').style.display = 'none';
        document.getElementById('pctErrorModal').style.display = 'none';
    },
-    saveItem() {
+   saveItem() {
        const item = {
            name: document.getElementById('itemNameModal').value,
            unit: document.getElementById('itemUnitModal').value,
-           quantity: parseFloat(document.getElementById('itemQuantityModal').value) || 0,
-           costPerUnit: parseFloat(document.getElementById('itemCostModal').value) || 0,
-           pct: parseFloat(document.getElementById('itemPctModal').value) || 0,
-           discount: parseFloat(document.getElementById('itemDiscountModal').value) || 0,
+           quantity: parseFloat(this.toEnglishDigits(document.getElementById('itemQuantityModal').value)) || 0,
+           costPerUnit: parseFloat(this.toEnglishDigits(document.getElementById('itemCostModal').value)) || 0,
+           pct: parseFloat(this.toEnglishDigits(document.getElementById('itemPctModal').value)) || 0,
+           discount: parseFloat(this.toEnglishDigits(document.getElementById('itemDiscountModal').value)) || 0,
            discountType: document.getElementById('itemDiscountTypeModal').value,
-           extra: parseFloat(document.getElementById('itemExtraModal').value) || 0,
+           extra: parseFloat(this.toEnglishDigits(document.getElementById('itemExtraModal').value)) || 0,
            extraType: document.getElementById('itemExtraTypeModal').value,
            method: document.getElementById('itemMethodModal').value,
            vatChecked: document.getElementById('itemVatModal').checked,
            notes: document.getElementById('itemNotesModal').value
        };
-        if (item.name.trim() === '') {
+       if (item.name.trim() === '') {
            const errorEl = document.getElementById('nameErrorModal');
            errorEl.textContent = this.i18n[this.state.currentLang].validation.emptyName;
            errorEl.style.display = 'block';
            return;
        }
-        if (item.method === 'margin' && item.pct >= 100) {
+       if (item.method === 'margin' && item.pct >= 100) {
            const errorEl = document.getElementById('pctErrorModal');
            errorEl.textContent = this.i18n[this.state.currentLang].validation.marginError;
            errorEl.style.display = 'block';
            return;
        }
-        this.state.items.push(item);
+       if (this.editingIndex !== null) {
+           this.state.items[this.editingIndex] = item;
+       } else {
+           this.state.items.push(item);
+       }
        this.calculateAll();
        this.hideModal();
+       this.resetModal();
+       this.updateModalTexts();
    },
     // Table Rendering
    renderTable() {
@@ -427,32 +490,32 @@ const App = {
            const tr = document.createElement('tr');
            tr.dataset.index = index;
             const tdTemplate = `
-               <td>${index + 1}</td>
+               <td>${this.formatNumber(index + 1, 0)}</td>
                <td><input type="text" class="edit-input" data-field="name" value="${item.name}" oninput="App.handleInlineEdit(event, ${index})"></td>
                <td><select class="edit-select" data-field="unit" onchange="App.handleInlineEdit(event, ${index})">${this.renderUnitOptions(item.unit)}</select></td>
-               <td><input type="number" class="edit-input" data-field="quantity" value="${item.quantity}" min="0" step="1" oninput="App.handleInlineEdit(event, ${index})"></td>
-               <td><input type="number" class="edit-input" data-field="costPerUnit" value="${item.costPerUnit}" min="0" step="0.01" oninput="App.handleInlineEdit(event, ${index})"></td>
-               <td>${(item.totalCost * this.state.currencyRate).toFixed(2) || '0.00'}</td>
-               <td><input type="number" class="edit-input" data-field="pct" value="${item.pct}" min="0" max="99.99" step="0.01" oninput="App.handleInlineEdit(event, ${index})">
+               <td><input type="text" class="edit-input numeric-input" data-field="quantity" value="${this.formatInputValue(item.quantity)}" inputmode="decimal" oninput="App.handleInlineEdit(event, ${index})"></td>
+               <td><input type="text" class="edit-input numeric-input" data-field="costPerUnit" value="${this.formatInputValue(item.costPerUnit)}" inputmode="decimal" oninput="App.handleInlineEdit(event, ${index})"></td>
+               <td>${this.formatNumber(item.totalCost * this.state.currencyRate)}</td>
+               <td><input type="text" class="edit-input numeric-input" data-field="pct" value="${this.formatInputValue(item.pct)}" inputmode="decimal" oninput="App.handleInlineEdit(event, ${index})">
                <div class="inline-error pct-error-${index}"></div>
                </td>
                <td>
-                   <input type="number" class="edit-input" data-field="discount" value="${item.discount}" min="0" step="0.01" oninput="App.handleInlineEdit(event, ${index})">
+                   <input type="text" class="edit-input numeric-input" data-field="discount" value="${this.formatInputValue(item.discount)}" inputmode="decimal" oninput="App.handleInlineEdit(event, ${index})">
                    <select class="edit-select" data-field="discountType" onchange="App.handleInlineEdit(event, ${index})">${this.renderDiscountTypeOptions(item.discountType)}</select>
                </td>
                <td>
-                   <input type="number" class="edit-input" data-field="extra" value="${item.extra}" min="0" step="0.01" oninput="App.handleInlineEdit(event, ${index})">
+                   <input type="text" class="edit-input numeric-input" data-field="extra" value="${this.formatInputValue(item.extra)}" inputmode="decimal" oninput="App.handleInlineEdit(event, ${index})">
                    <select class="edit-select" data-field="extraType" onchange="App.handleInlineEdit(event, ${index})">${this.renderExtraTypeOptions(item.extraType)}</select>
                </td>
                <td><select class="edit-select" data-field="method" onchange="App.handleInlineEdit(event, ${index})">${this.renderMethodOptions(item.method)}</select></td>
                <td>
                    <input type="checkbox" class="edit-checkbox" data-field="vatChecked" ${item.vatChecked ? 'checked' : ''} onchange="App.handleInlineEdit(event, ${index})">
-                   <span class="vat-amount">${(item.vatAmount * this.state.currencyRate).toFixed(2) || '0.00'}</span>
+                   <span class="vat-amount">${this.formatNumber(item.vatAmount * this.state.currencyRate)}</span>
                </td>
-               <td>${(item.profit * this.state.currencyRate).toFixed(2) || '0.00'}</td>
-               <td>${(item.finalPrice * this.state.currencyRate).toFixed(2) || '0.00'}</td>
+               <td>${this.formatNumber(item.profit * this.state.currencyRate)}</td>
+               <td>${this.formatNumber(item.finalPrice * this.state.currencyRate)}</td>
                <td class="notes-cell"><input type="text" class="edit-input" data-field="notes" value="${item.notes}" oninput="App.handleInlineEdit(event, ${index})"></td>
-               <td class="action-cell"><button class="delete-btn" onclick="App.deleteItem(${index})"><i class="fas fa-trash"></i></button></td>
+               <td class="action-cell"><button class="edit-btn" title="${this.i18n[this.state.currentLang].editBtn}" onclick="App.openEditModal(${index})"><i class="fas fa-edit"></i></button> <button class="delete-btn" onclick="App.deleteItem(${index})"><i class="fas fa-trash"></i></button></td>
            `;
             tr.innerHTML = tdTemplate;
            this.elements.itemsTableBody.appendChild(tr);
@@ -465,7 +528,7 @@ const App = {
    
    validateAndHandlePct(event, index) {
        const method = this.state.items[index].method;
-       const pct = parseFloat(event.target.value);
+       const pct = parseFloat(this.toEnglishDigits(event.target.value));
        const errorEl = document.querySelector(`.pct-error-${index}`);
        
        if (method === 'margin' && pct >= 100) {
@@ -479,12 +542,12 @@ const App = {
     handleInlineEdit(event, index) {
        const field = event.target.dataset.field;
        let value = event.target.value;
-        if (event.target.type === 'number') {
-           value = parseFloat(value) || 0;
+       if (event.target.classList.contains('numeric-input')) {
+           value = parseFloat(this.toEnglishDigits(value)) || 0;
        } else if (event.target.type === 'checkbox') {
            value = event.target.checked;
        }
-        this.state.items[index][field] = value;
+       this.state.items[index][field] = value;
        this.calculateAll();
    },
     renderModalOptions() {
