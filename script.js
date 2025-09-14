@@ -189,7 +189,22 @@ const App = {
     this.bindEvents();
     this.setLanguage();
     this.updateRateInfo();
-    // Update KPI cards if present\n    const kCost = document.getElementById('kpi-total-cost');\n    const kProfit = document.getElementById('kpi-total-profit');\n    const kFinal = document.getElementById('kpi-final-price');\n    if (kCost && kProfit && kFinal) {\n      kCost.textContent = this.formatNumber(totalCost * this.state.currencyRate);\n      kProfit.textContent = this.formatNumber(totalProfit * this.state.currencyRate);\n      kFinal.textContent = this.formatNumber(totalPrice * this.state.currencyRate);\n      const c = this.state.currency;\n      const c1 = document.getElementById('kpi-currency-1');\n      const c2 = document.getElementById('kpi-currency-2');\n      const c3 = document.getElementById('kpi-currency-3');\n      if (c1) c1.textContent = c; if (c2) c2.textContent = c; if (c3) c3.textContent = c;\n    }\n\n    this.renderTable();
+    // Update KPI cards if present
+    const kCost = document.getElementById('kpi-total-cost');
+    const kProfit = document.getElementById('kpi-total-profit');
+    const kFinal = document.getElementById('kpi-final-price');
+    if (kCost && kProfit && kFinal) {
+      kCost.textContent = this.formatNumber(totalCost * this.state.currencyRate);
+      kProfit.textContent = this.formatNumber(totalProfit * this.state.currencyRate);
+      kFinal.textContent = this.formatNumber(totalPrice * this.state.currencyRate);
+      const c = this.state.currency;
+      const c1 = document.getElementById('kpi-currency-1');
+      const c2 = document.getElementById('kpi-currency-2');
+      const c3 = document.getElementById('kpi-currency-3');
+      if (c1) c1.textContent = c; if (c2) c2.textContent = c; if (c3) c3.textContent = c;
+    }
+
+    this.renderTable();
     this.calculateAll();
   },
 
@@ -307,10 +322,37 @@ const App = {
     const headers = document.getElementById('table-headers').children;
     this.i18n[this.state.currentLang].tableHeaders.forEach((text, index) => {
       if (headers[index]) headers[index].textContent = text;
-    });\n\n    // KPI labels from tableHeaders indices (Total Cost, Profit, Final Price)\n    try {\n      const th = this.i18n[this.state.currentLang].tableHeaders;\n      const labCost = document.getElementById('kpi-total-cost-label');\n      const labProfit = document.getElementById('kpi-total-profit-label');\n      const labFinal = document.getElementById('kpi-final-price-label');\n      if (labCost && th[5]) labCost.textContent = th[5];\n      if (labProfit && th[11]) labProfit.textContent = th[11];\n      if (labFinal && th[12]) labFinal.textContent = th[12];\n    } catch(e) {}\n
+    });
+
+    // KPI labels from tableHeaders indices (Total Cost, Profit, Final Price)
+    try {
+      const th = this.i18n[this.state.currentLang].tableHeaders;
+      const labCost = document.getElementById('kpi-total-cost-label');
+      const labProfit = document.getElementById('kpi-total-profit-label');
+      const labFinal = document.getElementById('kpi-final-price-label');
+      if (labCost && th[5]) labCost.textContent = th[5];
+      if (labProfit && th[11]) labProfit.textContent = th[11];
+      if (labFinal && th[12]) labFinal.textContent = th[12];
+    } catch(e) {}
+
 
     this.renderModalOptions();
-    // Update KPI cards if present\n    const kCost = document.getElementById('kpi-total-cost');\n    const kProfit = document.getElementById('kpi-total-profit');\n    const kFinal = document.getElementById('kpi-final-price');\n    if (kCost && kProfit && kFinal) {\n      kCost.textContent = this.formatNumber(totalCost * this.state.currencyRate);\n      kProfit.textContent = this.formatNumber(totalProfit * this.state.currencyRate);\n      kFinal.textContent = this.formatNumber(totalPrice * this.state.currencyRate);\n      const c = this.state.currency;\n      const c1 = document.getElementById('kpi-currency-1');\n      const c2 = document.getElementById('kpi-currency-2');\n      const c3 = document.getElementById('kpi-currency-3');\n      if (c1) c1.textContent = c; if (c2) c2.textContent = c; if (c3) c3.textContent = c;\n    }\n\n    this.renderTable();
+    // Update KPI cards if present
+    const kCost = document.getElementById('kpi-total-cost');
+    const kProfit = document.getElementById('kpi-total-profit');
+    const kFinal = document.getElementById('kpi-final-price');
+    if (kCost && kProfit && kFinal) {
+      kCost.textContent = this.formatNumber(totalCost * this.state.currencyRate);
+      kProfit.textContent = this.formatNumber(totalProfit * this.state.currencyRate);
+      kFinal.textContent = this.formatNumber(totalPrice * this.state.currencyRate);
+      const c = this.state.currency;
+      const c1 = document.getElementById('kpi-currency-1');
+      const c2 = document.getElementById('kpi-currency-2');
+      const c3 = document.getElementById('kpi-currency-3');
+      if (c1) c1.textContent = c; if (c2) c2.textContent = c; if (c3) c3.textContent = c;
+    }
+
+    this.renderTable();
     this.drawCharts();
     this.updateRateInfo();
       this.updateModalTexts();
@@ -450,7 +492,22 @@ const App = {
     this.elements.totalExtraTd.textContent = this.formatNumber(totalExtra * this.state.currencyRate);
     this.elements.totalVatTd.textContent = this.formatNumber(totalVat * this.state.currencyRate);
 
-    // Update KPI cards if present\n    const kCost = document.getElementById('kpi-total-cost');\n    const kProfit = document.getElementById('kpi-total-profit');\n    const kFinal = document.getElementById('kpi-final-price');\n    if (kCost && kProfit && kFinal) {\n      kCost.textContent = this.formatNumber(totalCost * this.state.currencyRate);\n      kProfit.textContent = this.formatNumber(totalProfit * this.state.currencyRate);\n      kFinal.textContent = this.formatNumber(totalPrice * this.state.currencyRate);\n      const c = this.state.currency;\n      const c1 = document.getElementById('kpi-currency-1');\n      const c2 = document.getElementById('kpi-currency-2');\n      const c3 = document.getElementById('kpi-currency-3');\n      if (c1) c1.textContent = c; if (c2) c2.textContent = c; if (c3) c3.textContent = c;\n    }\n\n    this.renderTable();
+    // Update KPI cards if present
+    const kCost = document.getElementById('kpi-total-cost');
+    const kProfit = document.getElementById('kpi-total-profit');
+    const kFinal = document.getElementById('kpi-final-price');
+    if (kCost && kProfit && kFinal) {
+      kCost.textContent = this.formatNumber(totalCost * this.state.currencyRate);
+      kProfit.textContent = this.formatNumber(totalProfit * this.state.currencyRate);
+      kFinal.textContent = this.formatNumber(totalPrice * this.state.currencyRate);
+      const c = this.state.currency;
+      const c1 = document.getElementById('kpi-currency-1');
+      const c2 = document.getElementById('kpi-currency-2');
+      const c3 = document.getElementById('kpi-currency-3');
+      if (c1) c1.textContent = c; if (c2) c2.textContent = c; if (c3) c3.textContent = c;
+    }
+
+    this.renderTable();
     this.drawCharts();
     this.saveState();
   },
